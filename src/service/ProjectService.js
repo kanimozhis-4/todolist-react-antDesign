@@ -22,6 +22,6 @@ export const updateProject =async (id,payload)=>{
 export const deleteProject =async (id)=>{
     const projects=await api.deleteProject(id);
     // console.log("pppppppppp",projects);
-    return projects;
+    // return projects;
 
 }

@@ -6,18 +6,21 @@ import API from './components/API';
 import ProjectContext from './contexts/ProjectContext';
 import DisplayContent from './components/Display/DisplayContent';
 import DisplayContents from './components/API';
+import TaskContext from './contexts/TaskContext';
 
 function App() {
 
   return (
-    <ProjectContext> 
-    <Router>
-      <Routes>
-      <Route path="/" element={<HomePage/>} />
-        <Route path="/project/:id" element={<DisplayContent/>} />
-        
-      </Routes>
-    </Router> 
+    <ProjectContext>  
+      <TaskContext>
+      <Router>
+        <Routes>
+        <Route path="/" element={<HomePage/>} />
+          <Route path="/project/:id" element={<DisplayContent/>} />
+          
+        </Routes>
+      </Router>  
+    </TaskContext>
   </ProjectContext>
   )
 }

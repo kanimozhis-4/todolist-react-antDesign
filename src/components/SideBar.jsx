@@ -1,13 +1,11 @@
 import React, { useContext, useState } from "react";
 import { Layout, Menu, Button, Tooltip } from "antd";
-import {
-  LayoutOutlined,
-} from "@ant-design/icons";
-import { BellOutlined } from "@ant-design/icons"; // Bell icon from Ant Design
+import { LayoutOutlined } from "@ant-design/icons";
+import { BellOutlined } from "@ant-design/icons";
 import { Badge, Avatar, Typography } from "antd";
 
-import "antd/dist/reset.css"; // Ensure Ant Design styles are imported
-import "../index.css"; // Include Tailwind styles
+import "antd/dist/reset.css";
+import "../index.css";
 import Task from "./sideBar/Task";
 import Search from "./sideBar/Search";
 import Inbox from "./sideBar/Inbox";
@@ -18,20 +16,18 @@ import Favorites from "./sideBar/favorites/Favorites";
 import Projects from "./sideBar/projects/Projects";
 import { ProjectsContext } from "../contexts/ProjectContext";
 
-// const { Header, Content, Footer } = Layout;
-const { Sider, Content, Header } = Layout;
+const { Sider } = Layout;
 const SideBar = () => {
-  const {collapsed, toggleSidebar}=useContext(ProjectsContext)
-  // console.log("in",collapsed);
- 
+  const { collapsed, toggleSidebar } = useContext(ProjectsContext);
+
   return (
     <Sider
-      trigger={null} // Disable default trigger
+      trigger={null}
       collapsed={collapsed}
       collapsible
       width={280}
-      collapsedWidth={0} 
-      style={{ backgroundColor: 'rgb(242, 238, 235)' }}
+      collapsedWidth={0}
+      style={{ backgroundColor: "rgb(242, 238, 235)" }}
       className={`${collapsed ? "shadow-lg p-0" : "p-4"}`}
     >
       <div className="flex flex-col gap-6 group">
@@ -80,16 +76,16 @@ const SideBar = () => {
               </div>
             </Tooltip>
           </div>
-          <Task/>
-          <Search/>
-          <Inbox/>
-         <Today/>
-         <Upcoming/>
-         <FilterLabel/>
+          <Task />
+          <Search />
+          <Inbox />
+          <Today />
+          <Upcoming />
+          <FilterLabel />
         </div>
         <div className="flex flex-col gap-6">
           <Favorites />
-           <Projects  />
+          <Projects />
         </div>
       </div>
     </Sider>

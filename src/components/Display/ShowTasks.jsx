@@ -1,16 +1,14 @@
 import React, { useContext, useState } from "react";
 import { Checkbox } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { ProjectsContext } from "../../contexts/ProjectContext";
-import { deleteTask, closeTask } from "../../service/TaskService";
 import TaskForm from "./TaskForm";
+import { TasksContext } from "../../contexts/TaskContext";
 const ShowTasks = ({ projectId }) => {
-  const { allTask, setAllTask, setEditingTaskId, editingTaskId } =
-    useContext(ProjectsContext);
+  const { allTask, removeTask, setEditingTaskId, editingTaskId, closedTask } =
+    useContext(TasksContext);
   const [hoveredTaskId, setHoveredTaskId] = useState(null);
 
   const defaultProjectId = "2345640986";
-
   let task = allTask?.filter((task) =>
     projectId
       ? task.projectId === projectId
@@ -25,16 +23,10 @@ const ShowTasks = ({ projectId }) => {
     setHoveredTaskId(null);
   };
   const handleDelete = async (id) => {
-    const removeData = await deleteTask(id);
-    if (removeData) {
-      const task = allTask?.filter((task) => task.id != id);
-      setAllTask([...task]);
-    }
+    await removeTask(id);
   };
   const handleCheckbox = async (id) => {
-    const response = await closeTask(id);
-    const task = allTask.filter((task) => task.id != id);
-    setAllTask(task);
+    await closedTask(id);
   };
 
   return (

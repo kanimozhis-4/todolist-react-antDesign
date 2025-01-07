@@ -3,22 +3,14 @@ import {
   fetchProjects,
   postProject,
   updateProject,
+  deleteProject,
 } from "../service/ProjectService";
-import { fetchInboxTask } from "../service/TaskService";
+import { useReducer } from "react";
 export const ProjectsContext = createContext();
 const ProjectContext = ({ children }) => {
-  const [allProjects, setAllProjects] = useState([]);
-  const [allTask, setAllTask] = useState([]);
   const [selectedProject, setSelectedProject] = useState({});
   const [isProject, setIsProject] = useState(false);
-  const [editingTaskId, setEditingTaskId] = useState(null);
   const [showProjects, setShowProjects] = useState(false);
-  const [newTask, setNewTask] = useState({
-    content: "",
-    description: "",
-    due_date: "",
-    project_id: "",
-  });
   const [newProject, setNewProject] = useState({
     name: "",
     color: "charcoal",
@@ -48,57 +40,56 @@ const ProjectContext = ({ children }) => {
   };
   const [collapsed, setCollapsed] = useState(false);
   const [projectName, setProjectName] = useState("");
+  const projectInitialState = { projects: [] };
+  const projectReducer = (state, action) => {
+    switch (action.type) {
+      case "fetchProject":
+        return { ...state, projects: action.payload };
+      case "postProject":
+        return { ...state, projects: [...state.projects, action.payload] };
+      case "updateProject":
+        return {
+          ...state,
+          projects: state.projects.map((project) =>
+            project.id === action.payload.id ? action.payload : project
+          ),
+        };
+      case "deleteProject":
+        return {
+          ...state,
+          projects: state.projects.filter(
+            (project) => project.id !== action.payload
+          ),
+        };
+      default:
+        return state;
+    }
+  };
+  const [state, dispatch] = useReducer(projectReducer, projectInitialState);
 
   const toggleSidebar = () => {
     setCollapsed(!collapsed);
   };
-  const [isBoxVisible, setIsBoxVisible] = useState(false);
-  const fetchInitialData = async () => {
+  const fetchInitialProjectData = async () => {
     try {
-      console.log("out")
-      await fetchProjects().then((data) => {
-        setAllProjects(data);
-      });
-      const data = await fetchInboxTask();
-      setAllTask(data);
+      const ProjectData = await fetchProjects();
+      dispatch({ type: "fetchProject", payload: ProjectData });
     } catch (err) {
       console.error("Error fetching data:", err);
     }
   };
   const saveProject = async () => {
     try {
-      const payload = newProject;
-      const createdProject = await postProject(payload);
-      setAllProjects((prevProjects) => [...prevProjects, createdProject]);
+      const createdProject = await postProject(newProject);
+      dispatch({ type: "postProject", payload: createdProject });
     } catch (error) {
       console.error("Failed to create project:", error);
     }
   };
-  const editedProject = async () => {
+  const editedProject = async (id, newProject) => {
     try {
-      const payload = {
-        name: newProject.name,
-        color: newProject.color,
-        is_favorite: newProject.is_favorite,
-      };
-      const id = newProject.id;
-      const updatedProject = await updateProject(id, payload);
-      setAllProjects((prevProjects) =>
-        prevProjects.map((project) =>
-          project.id === id ? updatedProject : project
-        )
-      );
-    } catch (error) {
-      console.error("Failed to update project:", error);
-    }
-  };
-  const handleOk = async () => {
-    try {
-      if (newProject?.id) {
-        await editedProject();
-      } else {
-        await saveProject();
-      }
+      const updatedProject = await updateProject(id, newProject);
+      dispatch({ type: "updateProject", payload: updatedProject });
       setNewProject({
         name: "",
         color: "charcoal",
@@ -106,51 +97,48 @@ const ProjectContext = ({ children }) => {
       });
       setIsProject(false);
     } catch (error) {
-      console.error("Failed to save project:", error);
+      console.error("Failed to update project:", error);
     }
   };
-  const handleCancel = () => {
-    
-    setIsProject(false);
+  const removeProject = async (projectId) => {
+    try {
+      console.log("Deleting project with ID:", projectId);
+      await deleteProject(projectId);
+      dispatch({ type: "deleteProject", payload: projectId });
+    } catch (error) {
+      console.error("Failed to delete project:", error);
+    }
   };
-  const handleCreateProject = () => {
-    setIsProject(true);
-  };
+
   const handleColorChange = (value) => {
     setNewProject({ ...newProject, color: value });
   };
   useEffect(() => {
-    fetchInitialData();
+    fetchInitialProjectData();
   }, []);
   return (
     <ProjectsContext.Provider
       value={{
-        allProjects,
-        setAllProjects,
+        allProjects: state.projects,
+        dispatch: projectInitialState,
+        fetchInitialProjectData,
         selectedProject,
         setSelectedProject,
         colorMapping,
-        handleOk,
-        handleCancel,
-        handleCreateProject,
         handleColorChange,
         isProject,
         setIsProject,
         newProject,
         setNewProject,
-        newTask,
-        setNewTask,
-        allTask,
-        setAllTask,
         collapsed,
         toggleSidebar,
-        isBoxVisible,
-        setIsBoxVisible,
-        setEditingTaskId,
-        editingTaskId,
         showProjects,
         setShowProjects,
-        projectName,setProjectName
+        projectName,
+        setProjectName,
+        removeProject,
+        editedProject,
+        saveProject,
       }}
     >
       {children}

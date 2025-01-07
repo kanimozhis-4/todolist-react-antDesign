@@ -5,7 +5,7 @@ export const createTask=async(payload)=>{
     return task;
 
 }
-export const fetchInboxTask=async()=>{
+export const fetchTask=async()=>{
     const task=await api.getTasks();
    
     return task;

@@ -4,9 +4,8 @@ import { RightOutlined, PlusOutlined, DownOutlined } from "@ant-design/icons";
 import ShowProjects from "./ShowProjects";
 import ProjectForm from "./ProjectForm";
 const Projects = () => {
-  const { handleCreateProject, isProject,showProjects,setShowProjects } = useContext(ProjectsContext);
-
- 
+  const { isProject, showProjects, setShowProjects, setIsProject } =
+    useContext(ProjectsContext);
 
   return (
     <div>
@@ -17,7 +16,7 @@ const Projects = () => {
             className={`text-gray-500 opacity-0 transition-opacity group-hover:opacity-100 group-focus:opacity-100 cursor-default
       
             `}
-            onClick={handleCreateProject}
+            onClick={() => setIsProject(true)}
           />
           {!showProjects ? (
             <RightOutlined

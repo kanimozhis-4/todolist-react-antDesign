@@ -1,6 +1,5 @@
 import React, { useState, useContext } from "react";
 import { ProjectsContext } from "../../../contexts/ProjectContext";
-import { updateProject, deleteProject } from "../../../service/ProjectService";
 import { Tooltip } from "antd";
 import { EllipsisOutlined } from "@ant-design/icons";
 import ProjectForm from "./ProjectForm";
@@ -10,16 +9,16 @@ const ShowProjects = ({ show }) => {
   const navigate = useNavigate();
   const {
     allProjects,
-    setAllProjects,
+    newProject,
+    setNewProject,
     selectedProject,
     setSelectedProject,
     colorMapping,
-    newProject,
-    setNewProject,
     isProject,
     setIsProject,
+    removeProject,
+    editedProject,
   } = useContext(ProjectsContext);
-  const [editProject, setEditProject] = useState(false);
   const [activeTooltip, setActiveTooltip] = useState(null);
   const [showOption, setShowOption] = useState(false);
   const handleEdit = (project) => {
@@ -30,7 +29,6 @@ const ShowProjects = ({ show }) => {
       color: project.color,
       is_favorite: project.isFavorite,
     });
-    setEditProject(true);
     setActiveTooltip(null);
     setIsProject(true);
   };
@@ -47,26 +45,11 @@ const ShowProjects = ({ show }) => {
         color: updatedProject.color,
         is_favorite: updatedProject.isFavorite,
       };
-      const updatedData = await updateProject(id, payload);
-
-      setAllProjects((prevProjects) =>
-        prevProjects.map((proj) => (proj.id === id ? updatedData : proj))
-      );
+      await editedProject(id, payload);
 
       setActiveTooltip(null);
     } catch (error) {
       console.error("Failed to update favorite state:", error);
-    }
-  };
-  const handleDelete = async (project) => {
-    try {
-      const id = project.id;
-      const removedData = await deleteProject(id);
-      setAllProjects((prevProjects) =>
-        prevProjects.filter((project) => project.id !== id)
-      );
-    } catch (error) {
-      console.error("Failed to update delete:", error);
     }
   };
   const handleItemClick = (project) => {
@@ -140,7 +123,7 @@ const ShowProjects = ({ show }) => {
                         <div
                           className="cursor-pointer p-2 hover:bg-gray-100 rounded"
                           onClick={() => {
-                            handleDelete(project);
+                            removeProject(project.id);
                           }}
                         >
                           🗑️ <span className="ml-2">Delete</span>

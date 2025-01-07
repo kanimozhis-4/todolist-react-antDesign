@@ -1,49 +1,49 @@
-import React, { useContext, useState ,useEffect} from "react";
-import {
-  Layout,
-  Menu,
-  Button,
-  Tooltip,
-  Card,
-  Input,
-  DatePicker,
-  Dropdown,
-  Space,
-} from "antd";
+import React, { useContext, useState, useEffect } from "react";
+import { Button, Card, Input, DatePicker, Dropdown, Space } from "antd";
 import { ProjectsContext } from "../../contexts/ProjectContext";
 import moment from "moment";
-import _ from 'lodash';
+import _ from "lodash";
 import { DownOutlined, CheckOutlined } from "@ant-design/icons";
-import { createTask } from "../../service/TaskService";
-import { editTask } from "../../service/TaskService";
-const TaskForm = ({taskId,projectId}) => {
-  const { selectedProject, allProjects, colorMapping ,newTask,setNewTask,allTask,setAllTask
-    ,setIsBoxVisible,setEditingTaskId} = useContext(ProjectsContext);
+import { TasksContext } from "../../contexts/TaskContext";
+const TaskForm = ({ taskId, projectId }) => {
+  const { selectedProject, allProjects, colorMapping } =
+    useContext(ProjectsContext);
+  const {
+    newTask,
+    addNewTask,
+    setNewTask,
+    allTask,
+    setEditingTaskId,
+    editedTask,
+  } = useContext(TasksContext);
   const [selectedProjectName, setSelectedProjectName] = useState({
     name: null,
     color: null,
-  }); 
-  let tempTask={};
-useEffect(() => {
+  });
+  let tempTask = {};
+  useEffect(() => {
     if (taskId) {
-        console.log("clicked")
-        const taskToEdit = allTask.find((task) => task.id === taskId);
-        if (taskToEdit) {
-            setNewTask({
-                content: taskToEdit.content,
-                description: taskToEdit.description,
-                due_date: taskToEdit.due?.date ? moment(taskToEdit.due.date, "YYYY-MM-DD") : null, 
-                project_id: taskToEdit.project_id,
-            });
-        } 
-        tempTask={
-            content: taskToEdit.content,
-            description: taskToEdit.description,
-            due_date: taskToEdit.due?.date ? moment(taskToEdit.due.date, "YYYY-MM-DD") : null, 
-            project_id: taskToEdit.project_id
-        }
+      const taskToEdit = allTask.find((task) => task.id === taskId);
+      if (taskToEdit) {
+        setNewTask({
+          content: taskToEdit.content,
+          description: taskToEdit.description,
+          due_date: taskToEdit.due?.date
+            ? moment(taskToEdit.due.date, "YYYY-MM-DD")
+            : null,
+          project_id: taskToEdit.project_id,
+        });
+      }
+      tempTask = {
+        content: taskToEdit.content,
+        description: taskToEdit.description,
+        due_date: taskToEdit.due?.date
+          ? moment(taskToEdit.due.date, "YYYY-MM-DD")
+          : null,
+        project_id: taskToEdit.project_id,
+      };
     }
-}, []);
+  }, []);
   const menuItems = allProjects.map((project) => ({
     key: project.name,
     label: (
@@ -76,15 +76,15 @@ useEffect(() => {
       </span>
     ),
   }));
-  let selectedProjectColor=""
-  if(selectedProject!=""){
+  let selectedProjectColor = "";
+  if (selectedProject != "") {
     const project = allProjects.find(
-        (project) => project.name===selectedProject.name
-      );
-    selectedProjectColor=project?.color
+      (project) => project.name === selectedProject.name
+    );
+    selectedProjectColor = project?.color;
   }
-  
-  const handleDropdown= (projectName) => {
+
+  const handleDropdown = (projectName) => {
     const project = allProjects.find(
       (project) => project.name == projectName.key
     );
@@ -94,54 +94,42 @@ useEffect(() => {
     };
     setSelectedProjectName(selectedProject);
     setNewTask((prevTask) => ({
-        ...prevTask,
-        project_id: project.id, 
-      }));
+      ...prevTask,
+      project_id: project.id,
+    }));
     console.log("Selected Project: ", selectedProject);
   };
   const handleInputChange = (value, field) => {
     if (field === "due_date" && value) {
-      
-      console.log("valueeee",value,moment(value));
-        value = moment(value); 
+      console.log("valueeee", value, moment(value));
+      value = moment(value);
     }
     setNewTask((prevTask) => ({
-        ...prevTask,
-        [field]: value, 
+      ...prevTask,
+      [field]: value,
     }));
-};
-const handleTask = async () => { 
-    console.log("project_id",projectId)
-    if(taskId===""){
-    const taskToSave = {
+  };
+  const handleTask = async () => {
+    if (taskId === "") {
+      const taskToSave = {
         ...newTask,
-        project_id: projectId || "2345640986", 
-        due_date: newTask.due_date ? newTask.due_date.format("YYYY-MM-DD") : null,
-    };
-    const createdTask = await createTask(taskToSave);
-    setAllTask([...allTask,createdTask])
-    } 
-    else{
-        const editData=await editTask(taskId,newTask);
-        setAllTask((prevTasks) => 
-            prevTasks.map((task) => 
-              task.id === editData.id ? { ...task, ...editData } : task
-            )
-          );
-    } 
-    setEditingTaskId(null)
-
-}; 
-const handleEditCancel =async()=>{
-    console.log("tempTask",tempTask);
-    setNewTask({...tempTask});
-    if(taskId!==""){
-        setEditingTaskId(null)
-    }else{
-        setIsBoxVisible(false)
-        setEditingTaskId(null)
+        project_id: projectId || "2345640986",
+        due_date: newTask.due_date
+          ? newTask.due_date.format("YYYY-MM-DD")
+          : null,
+      };
+      await addNewTask(taskToSave);
+    } else {
+      await editedTask(taskId, newTask);
     }
-}
+    setEditingTaskId(null);
+  };
+  const handleEditCancel = async () => {
+    console.log("tempTask", tempTask);
+    setNewTask({ ...tempTask });
+
+    setEditingTaskId(null);
+  };
 
   return (
     <Card
@@ -153,19 +141,19 @@ const handleEditCancel =async()=>{
         <Input
           placeholder="Call family Thursday at 7pm p1"
           className="border-none text-sm font-bold placeholder-gray-500 outline-none focus:ring-0"
-          value={newTask.content} 
+          value={newTask.content}
           onChange={(e) => handleInputChange(e.target.value, "content")}
         />
         <Input
           placeholder="Description"
           className="border-none outline-none focus:ring-0"
-          value={newTask.description} 
+          value={newTask.description}
           onChange={(e) => handleInputChange(e.target.value, "description")}
         />
-       <DatePicker
-        className="w-[25%] m-2"
-        value={newTask.due_date || null}  // Pass moment object or null
-        onChange={(date) => handleInputChange(date, "due_date")}
+        <DatePicker
+          className="w-[25%] m-2"
+          value={newTask.due_date || null}
+          onChange={(date) => handleInputChange(date, "due_date")}
         />
         <hr />
         <div className="flex flex-row justify-between">
@@ -191,19 +179,23 @@ const handleEditCancel =async()=>{
                     {selectedProjectName.name}
                   </span>
                 ) : (
-                    <>
-                  {_.isEmpty(selectedProject)? "Inbox":
-                  <span>
-                  <span
-                    style={{
-                      color: colorMapping[selectedProjectColor],
-                      marginRight: "8px",
-                    }}
-                  >
-                    #
-                  </span>
-                  {selectedProject.name}
-                </span>}</>
+                  <>
+                    {_.isEmpty(selectedProject) ? (
+                      "Inbox"
+                    ) : (
+                      <span>
+                        <span
+                          style={{
+                            color: colorMapping[selectedProjectColor],
+                            marginRight: "8px",
+                          }}
+                        >
+                          #
+                        </span>
+                        {selectedProject.name}
+                      </span>
+                    )}
+                  </>
                 )}
                 <DownOutlined />
               </Space>
@@ -211,15 +203,24 @@ const handleEditCancel =async()=>{
           </Dropdown>
 
           <div className="flex justify-end space-x-2 m-2">
-            <Button onClick={() => {handleEditCancel()}}>Cancel</Button>
-            <Button type="primary" 
-             style={{
+            <Button
+              onClick={() => {
+                handleEditCancel();
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="primary"
+              style={{
                 backgroundColor: newTask.content === "" ? "#f5c6cb" : "#f44336",
                 borderColor: newTask.content === "" ? "#f5c6cb" : "#f44336",
               }}
-            className={`bg-red-600 `} 
-            onClick={handleTask}
-            >{taskId=="" ?"Add task":"Save Task"}</Button>
+              className={`bg-red-600 `}
+              onClick={handleTask}
+            >
+              {taskId == "" ? "Add task" : "Save Task"}
+            </Button>
           </div>
         </div>
       </div>

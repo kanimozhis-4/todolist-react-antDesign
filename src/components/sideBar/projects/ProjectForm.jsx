@@ -1,18 +1,19 @@
-import React, { useContext, useState,  useEffect } from "react";
+import React, { useContext} from "react";
 import { Modal, Form, Input, Switch, Button, Select, Tooltip } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { ProjectsContext } from "../../../contexts/ProjectContext";
 const ProjectForm = ({ isVisible }) => {
   const {
     colorMapping,
-    handleOk,
-    handleCancel,
     handleColorChange,
     newProject,
     setNewProject,
+    setIsProject,
+    editedProject,
+    saveProject,
   } = useContext(ProjectsContext);
-  const tempProject={...newProject};
-  
+  const tempProject = { ...newProject };
+
   return (
     <Modal
       title={
@@ -27,9 +28,19 @@ const ProjectForm = ({ isVisible }) => {
         </div>
       }
       open={isVisible}
-      onCancel={()=>{ console.log(tempProject,"ttttttttt");setNewProject({...tempProject});handleCancel()}}
+      onCancel={() => {
+        console.log(tempProject, "ttttttttt");
+        setNewProject({ ...tempProject });
+        setIsProject(false);
+      }}
       footer={[
-        <Button key="cancel" onClick={handleCancel}>
+        <Button
+          key="cancel"
+          onClick={() => {
+            setNewProject({ ...tempProject });
+            setIsProject(false);
+          }}
+        >
           Cancel
         </Button>,
         <Button
@@ -38,7 +49,9 @@ const ProjectForm = ({ isVisible }) => {
           className="bg-red-700"
           disabled={newProject.name === ""}
           onClick={() => {
-            handleOk();
+            newProject?.id
+              ? editedProject(newProject?.id, newProject)
+              : saveProject();
           }}
           style={{
             backgroundColor: newProject.name === "" ? "#f5c6cb" : "#f44336",

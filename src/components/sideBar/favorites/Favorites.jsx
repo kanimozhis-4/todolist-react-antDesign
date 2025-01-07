@@ -1,13 +1,9 @@
-import React, { useState ,useContext } from "react";
-import { RightOutlined, DownOutlined ,EllipsisOutlined} from "@ant-design/icons";
-import { Tooltip } from "antd";
-import { ProjectsContext } from "../../../contexts/ProjectContext";
+import React, { useState } from "react";
+import { RightOutlined, DownOutlined } from "@ant-design/icons";
 import ShowProjects from "../projects/ShowProjects";
 const Favorites = () => {
   const [showFavorites, setShowFavorites] = useState(false);
-  const [showOption, setShowOption] = useState(false);
-  const { allProjects,selectedProject,setSelectedProject,colorMapping } = useContext(ProjectsContext);
-  const [activeTooltip, setActiveTooltip] = useState(null); 
+
   return (
     <div>
       <div className="flex flex-row justify-between">
@@ -29,13 +25,8 @@ const Favorites = () => {
           />
         )}
       </div>
-      {showFavorites &&
-       <ShowProjects show={"favorites"}/>
-      }
-        </div>
-      // )}
-     
-    // </div> 
+      {showFavorites && <ShowProjects show={"favorites"} />}
+    </div>
   );
 };
 

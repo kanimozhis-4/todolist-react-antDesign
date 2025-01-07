@@ -5,8 +5,6 @@ import {
   EllipsisOutlined,
   MessageOutlined,
 } from "@ant-design/icons";
-import { fetchProjects } from "../../service/ProjectService";
-import { fetchInboxTask } from "../../service/TaskService";
 import { ProjectsContext } from "../../contexts/ProjectContext";
 import { PlusOutlined, LayoutOutlined } from "@ant-design/icons";
 import { updateProject } from "../../service/ProjectService";
@@ -14,6 +12,7 @@ import TaskForm from "./TaskForm";
 import ShowTasks from "./ShowTasks";
 import SideBar from "../SideBar";
 import { useParams } from "react-router-dom";
+import { TasksContext } from "../../contexts/TaskContext";
 
 const { Content, Header } = Layout;
 
@@ -21,43 +20,33 @@ const DisplayContent = () => {
   const { id } = useParams();
   const {
     allProjects,
+    dispatch,
     collapsed,
     toggleSidebar,
-    setEditingTaskId,
-    editingTaskId,
     setAllProjects,
-    setAllTask,
-    setNewTask,
     setSelectedProject,
-    selectedProject
+    selectedProject,
+    fetchInitialProjectData,
   } = useContext(ProjectsContext);
+  const { setNewTask, setEditingTaskId, editingTaskId, fetchInitialTaskData } =
+    useContext(TasksContext);
   const [isEditing, setIsEditing] = useState(false);
-  const [projectName,setProjectName]=useState("Inbox");
-
- 
-  const fetchInitialData = async () => {
-    try {
-      console.log("in");
-      const projectData = await fetchProjects();
-      setAllProjects(projectData);
-  
-      const taskData = await fetchInboxTask();
-      setAllTask(taskData);
-  
-      if (id) {
-        const project = projectData.find((project) => project.id === id);
+  const [projectName, setProjectName] = useState("Inbox");
+ const fetchInitialData=async()=>{
+  await fetchInitialProjectData();
+  await fetchInitialTaskData();
+  const project = allProjects.find((project) => project.id === id);
+      if (project) {
         setProjectName(project?.name || "Inbox");
+        setSelectedProject(project);
+        console.log(project,"project")
       }
-    } catch (err) {
-      console.error("Error fetching data:", err);
-    }
-  };
-  
+ }
   useEffect(() => {
-    if (id) {
-      fetchInitialData();
-    } else {
-      setProjectName("Inbox");
+    if (id) { 
+      fetchInitialData()
+      
+      
     }
   }, []);
 
@@ -77,13 +66,14 @@ const DisplayContent = () => {
         is_favorite: selectedProject.isFavorite,
       };
       const editedData = await updateProject(id, payload);
+      dispatch();
       const project = allProjects.map((project) => {
         if (project.id === id) {
           return editedData;
         }
         return project;
       });
-      setSelectedProject({...selectedProject,name:projectName})
+      setSelectedProject({ ...selectedProject, name: projectName });
       setAllProjects([...project]);
       setIsEditing(false);
     }
@@ -121,7 +111,7 @@ const DisplayContent = () => {
             {isEditing ? (
               <Input
                 className="text-2xl font-bold"
-                value={selectedProject.name ||projectName}
+                value={selectedProject.name || projectName}
                 onChange={handleInputChange}
                 onBlur={() => setIsEditing(false)}
                 onPressEnter={handleKeyPress}
@@ -141,10 +131,12 @@ const DisplayContent = () => {
               <PlusOutlined
                 className="text-red-500"
                 onClick={() => {
-                  setNewTask({content: "",
+                  setNewTask({
+                    content: "",
                     description: "",
                     due_date: "",
-                    project_id: ""})
+                    project_id: "",
+                  });
                   setEditingTaskId("1");
                 }}
               />
