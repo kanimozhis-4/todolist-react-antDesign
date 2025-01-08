@@ -7,7 +7,6 @@ import {
 } from "@ant-design/icons";
 import { ProjectsContext } from "../../contexts/ProjectContext";
 import { PlusOutlined, LayoutOutlined } from "@ant-design/icons";
-import { updateProject } from "../../service/ProjectService";
 import TaskForm from "./TaskForm";
 import ShowTasks from "./ShowTasks";
 import SideBar from "../SideBar";
@@ -16,48 +15,30 @@ import { TasksContext } from "../../contexts/TaskContext";
 
 const { Content, Header } = Layout;
 
-const DisplayContent = () => {
+const DisplayContent = ({ collapsed, setCollapsed }) => {
   const { id } = useParams();
-  const {
-    allProjects,
-    dispatch,
-    collapsed,
-    toggleSidebar,
-    setAllProjects,
-    setSelectedProject,
-    selectedProject,
-    fetchInitialProjectData,
-  } = useContext(ProjectsContext);
-  const { setNewTask, setEditingTaskId, editingTaskId, fetchInitialTaskData } =
-    useContext(TasksContext);
+  const { allProjects, editedProject, fetchInitialProjectData } =
+    useContext(ProjectsContext);
+  const { setNewTask, fetchInitialTaskData } = useContext(TasksContext);
   const [isEditing, setIsEditing] = useState(false);
-  const [projectName, setProjectName] = useState("Inbox");
- const fetchInitialData=async()=>{
-  await fetchInitialProjectData();
-  await fetchInitialTaskData();
-  const project = allProjects.find((project) => project.id === id);
-      if (project) {
-        setProjectName(project?.name || "Inbox");
-        setSelectedProject(project);
-        console.log(project,"project")
-      }
- }
-  useEffect(() => {
-    if (id) { 
-      fetchInitialData()
-      
-      
+  const [editingTaskId, setEditingTaskId] = useState(null);
+  const [selectedProject, setSelectedProject] = useState({});
+  let projectName = "Inbox";
+  console.log(selectedProject);
+  const fetchInitialData = async () => {
+    await fetchInitialProjectData();
+    const project = allProjects.find((project) => project.id === id);
+    if (project) {
+      setSelectedProject({ ...project });
+      projectName = project?.name;
     }
-  }, []);
-
-  const handleEditClick = () => {
-    setIsEditing(true);
+    await fetchInitialTaskData();
   };
-
-  const handleInputChange = (e) => {
-    setProjectName(e.target.value);
-  };
-
+  useEffect(() => {
+    if (id) {
+      fetchInitialData();
+    }
+  }, [id]);
   const handleKeyPress = async (e) => {
     if (e.key === "Enter") {
       const payload = {
@@ -65,16 +46,14 @@ const DisplayContent = () => {
         color: selectedProject.color,
         is_favorite: selectedProject.isFavorite,
       };
-      const editedData = await updateProject(id, payload);
-      dispatch();
+      await editedProject(id, payload);
       const project = allProjects.map((project) => {
         if (project.id === id) {
-          return editedData;
+          return payload;
         }
         return project;
       });
       setSelectedProject({ ...selectedProject, name: projectName });
-      setAllProjects([...project]);
       setIsEditing(false);
     }
   };
@@ -86,7 +65,7 @@ const DisplayContent = () => {
             <Button
               type="text"
               className="text-gray-600 m-2 ml-6"
-              onClick={toggleSidebar}
+              onClick={setCollapsed(!collapsed)}
               icon={<LayoutOutlined />}
             />
           </div>
@@ -111,8 +90,14 @@ const DisplayContent = () => {
             {isEditing ? (
               <Input
                 className="text-2xl font-bold"
-                value={selectedProject.name || projectName}
-                onChange={handleInputChange}
+                value={projectName}
+                onChange={(e) => {
+                  setSelectedProject({
+                    ...selectedProject,
+                    name: e.target.value,
+                  });
+                  projectName = e.target.value;
+                }}
                 onBlur={() => setIsEditing(false)}
                 onPressEnter={handleKeyPress}
                 autoFocus
@@ -120,13 +105,18 @@ const DisplayContent = () => {
             ) : (
               <span
                 className="text-2xl font-bold"
-                onClick={handleEditClick}
+                onClick={() => setIsEditing(true)}
                 style={{ cursor: "pointer" }}
               >
-                {selectedProject.name || projectName}
+                {selectedProject?.name || projectName}
               </span>
             )}
-            <ShowTasks projectId={id} />
+            <ShowTasks
+              projectId={id}
+              selectedProject={selectedProject}
+              editingTaskId={editingTaskId}
+              setEditingTaskId={setEditingTaskId}
+            />
             <div className="flex flex-row space-x-2">
               <PlusOutlined
                 className="text-red-500"
@@ -143,7 +133,14 @@ const DisplayContent = () => {
               <h5 className={`text-gray-500`}>Add Task</h5>
             </div>
 
-            {editingTaskId === "1" && <TaskForm taskId={""} projectId={id} />}
+            {editingTaskId === "1" && (
+              <TaskForm
+                taskId={""}
+                projectId={id}
+                selectedProject={selectedProject}
+                setEditingTaskId={setEditingTaskId}
+              />
+            )}
           </div>
         </Content>
       </Layout>

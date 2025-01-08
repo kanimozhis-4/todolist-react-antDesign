@@ -5,21 +5,21 @@ import moment from "moment";
 import _ from "lodash";
 import { DownOutlined, CheckOutlined } from "@ant-design/icons";
 import { TasksContext } from "../../contexts/TaskContext";
-const TaskForm = ({ taskId, projectId }) => {
-  const { selectedProject, allProjects, colorMapping } =
+const TaskForm = ({ taskId, projectId ,selectedProject,setEditingTaskId}) => {
+  const { allProjects, colorMapping } =
     useContext(ProjectsContext);
   const {
     newTask,
     addNewTask,
     setNewTask,
     allTask,
-    setEditingTaskId,
     editedTask,
   } = useContext(TasksContext);
   const [selectedProjectName, setSelectedProjectName] = useState({
     name: null,
     color: null,
-  });
+  }); 
+  
   let tempTask = {};
   useEffect(() => {
     if (taskId) {
@@ -110,14 +110,14 @@ const TaskForm = ({ taskId, projectId }) => {
     }));
   };
   const handleTask = async () => {
+    const taskToSave = {
+      ...newTask,
+      project_id: projectId || "2345640986",
+      due_date: newTask.due_date
+        ? newTask.due_date.format("YYYY-MM-DD")
+        : null,
+    }; 
     if (taskId === "") {
-      const taskToSave = {
-        ...newTask,
-        project_id: projectId || "2345640986",
-        due_date: newTask.due_date
-          ? newTask.due_date.format("YYYY-MM-DD")
-          : null,
-      };
       await addNewTask(taskToSave);
     } else {
       await editedTask(taskId, newTask);

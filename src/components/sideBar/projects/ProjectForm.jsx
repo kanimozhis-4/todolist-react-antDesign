@@ -1,14 +1,12 @@
-import React, { useContext} from "react";
+import React, { useContext } from "react";
 import { Modal, Form, Input, Switch, Button, Select, Tooltip } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { ProjectsContext } from "../../../contexts/ProjectContext";
-const ProjectForm = ({ isVisible }) => {
+const ProjectForm = ({ isVisible, setIsProject }) => {
   const {
     colorMapping,
-    handleColorChange,
     newProject,
     setNewProject,
-    setIsProject,
     editedProject,
     saveProject,
   } = useContext(ProjectsContext);
@@ -29,7 +27,6 @@ const ProjectForm = ({ isVisible }) => {
       }
       open={isVisible}
       onCancel={() => {
-        console.log(tempProject, "ttttttttt");
         setNewProject({ ...tempProject });
         setIsProject(false);
       }}
@@ -52,6 +49,7 @@ const ProjectForm = ({ isVisible }) => {
             newProject?.id
               ? editedProject(newProject?.id, newProject)
               : saveProject();
+            setIsProject(false);
           }}
           style={{
             backgroundColor: newProject.name === "" ? "#f5c6cb" : "#f44336",
@@ -93,7 +91,7 @@ const ProjectForm = ({ isVisible }) => {
           <Select
             style={{ width: 200 }}
             value={newProject.color}
-            onChange={handleColorChange}
+            onChange={(value) => setNewProject({ ...newProject, color: value })}
             placeholder="Select a color"
           >
             {Object.entries(colorMapping).map(([name, hex]) => (

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { Layout, Button} from "antd";
 import {
   LayoutOutlined,
@@ -9,28 +9,29 @@ import "../index.css";
 import SideBar from "./SideBar";
 
 import DisplayContent from "./Display/DisplayContent";
-import { ProjectsContext } from "../contexts/ProjectContext";
 
 
 function HomePage() {
-  const {collapsed,toggleSidebar}=useContext(ProjectsContext)
+  const [collapsed, setCollapsed] = useState(false);
  
   return (
     <Layout className="min-h-screen ">
-      <SideBar 
+      <SideBar collapsed={collapsed}
+      setCollapsed={setCollapsed}
       />
       {collapsed && (
         <div>
           <Button
             type="text"
             className="text-gray-600  m-2 ml-6"
-            onClick={toggleSidebar}
+            onClick={()=>setCollapsed(!collapsed)}
             icon={<LayoutOutlined />}
           />
         </div>
       )}
     
-        <DisplayContent></DisplayContent>
+        <DisplayContent collapsed={collapsed}
+      setCollapsed={setCollapsed}></DisplayContent>
         
       
     </Layout> 

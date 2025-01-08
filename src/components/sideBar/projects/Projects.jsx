@@ -1,11 +1,10 @@
-import React, { useState, useContext } from "react";
-import { ProjectsContext } from "../../../contexts/ProjectContext";
+import React, { useState} from "react";
 import { RightOutlined, PlusOutlined, DownOutlined } from "@ant-design/icons";
 import ShowProjects from "./ShowProjects";
 import ProjectForm from "./ProjectForm";
 const Projects = () => {
-  const { isProject, showProjects, setShowProjects, setIsProject } =
-    useContext(ProjectsContext);
+  const [isProject, setIsProject] = useState(false);
+  const [showProjects, setShowProjects] = useState(false);
 
   return (
     <div>
@@ -37,8 +36,14 @@ const Projects = () => {
           )}
         </div>
       </div>
-      {showProjects && <ShowProjects show={"all"} />}
-      <ProjectForm isVisible={isProject} />
+      {showProjects && (
+        <ShowProjects
+          show={"all"}
+          isProject={isProject}
+          setIsProject={setIsProject}
+        />
+      )}
+      <ProjectForm isVisible={isProject} setIsProject={setIsProject} />
     </div>
   );
 };

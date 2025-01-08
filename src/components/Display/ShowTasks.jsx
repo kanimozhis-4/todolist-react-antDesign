@@ -3,8 +3,8 @@ import { Checkbox } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import TaskForm from "./TaskForm";
 import { TasksContext } from "../../contexts/TaskContext";
-const ShowTasks = ({ projectId }) => {
-  const { allTask, removeTask, setEditingTaskId, editingTaskId, closedTask } =
+const ShowTasks = ({ projectId,selectedProject , setEditingTaskId, editingTaskId}) => {
+  const { allTask, removeTask, closedTask } =
     useContext(TasksContext);
   const [hoveredTaskId, setHoveredTaskId] = useState(null);
 
@@ -33,7 +33,7 @@ const ShowTasks = ({ projectId }) => {
     <div className="flex flex-col space-y-4">
       {task.map((task) =>
         editingTaskId === task.id ? (
-          <TaskForm key={task.id} taskId={task.id} projectId={projectId} />
+          <TaskForm key={task.id} taskId={task.id} projectId={projectId} selectedProject={selectedProject} setEditingTaskId={setEditingTaskId}/>
         ) : (
           <div
             key={task.id}

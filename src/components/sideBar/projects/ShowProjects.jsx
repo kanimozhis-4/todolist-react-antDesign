@@ -5,20 +5,17 @@ import { EllipsisOutlined } from "@ant-design/icons";
 import ProjectForm from "./ProjectForm";
 import { useNavigate } from "react-router-dom";
 
-const ShowProjects = ({ show }) => {
+const ShowProjects = ({ show, isProject, setIsProject }) => {
   const navigate = useNavigate();
   const {
     allProjects,
     newProject,
     setNewProject,
-    selectedProject,
-    setSelectedProject,
     colorMapping,
-    isProject,
-    setIsProject,
     removeProject,
     editedProject,
   } = useContext(ProjectsContext);
+  const [selectedProject, setSelectedProject] = useState({});
   const [activeTooltip, setActiveTooltip] = useState(null);
   const [showOption, setShowOption] = useState(false);
   const handleEdit = (project) => {
@@ -46,6 +43,7 @@ const ShowProjects = ({ show }) => {
         is_favorite: updatedProject.isFavorite,
       };
       await editedProject(id, payload);
+      setIsProject(false);
 
       setActiveTooltip(null);
     } catch (error) {
@@ -145,7 +143,7 @@ const ShowProjects = ({ show }) => {
             </div>
           );
       })}
-      <ProjectForm isVisible={isProject} />
+      <ProjectForm isVisible={isProject} setIsProject={setIsProject} />
     </div>
   );
 };

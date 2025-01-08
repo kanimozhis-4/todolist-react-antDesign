@@ -1,8 +1,8 @@
-import React, { useContext, useState } from "react";
-import { Layout, Menu, Button, Tooltip } from "antd";
+import React from "react";
+import { Layout, Button, Tooltip } from "antd";
 import { LayoutOutlined } from "@ant-design/icons";
 import { BellOutlined } from "@ant-design/icons";
-import { Badge, Avatar, Typography } from "antd";
+import { Badge, Avatar } from "antd";
 
 import "antd/dist/reset.css";
 import "../index.css";
@@ -14,11 +14,9 @@ import Upcoming from "./sideBar/Upcoming";
 import FilterLabel from "./sideBar/FilterLabel";
 import Favorites from "./sideBar/favorites/Favorites";
 import Projects from "./sideBar/projects/Projects";
-import { ProjectsContext } from "../contexts/ProjectContext";
 
 const { Sider } = Layout;
-const SideBar = () => {
-  const { collapsed, toggleSidebar } = useContext(ProjectsContext);
+const SideBar = ({collapsed,setCollapsed}) => {
 
   return (
     <Sider
@@ -70,7 +68,7 @@ const SideBar = () => {
                 <Button
                   type="text"
                   className="text-gray-600"
-                  onClick={toggleSidebar}
+                  onClick={()=>setCollapsed(!collapsed)}
                   icon={<LayoutOutlined />}
                 />
               </div>

@@ -1,16 +1,16 @@
 import React, { useState, createContext, useEffect } from "react";
 import {
-  fetchProjects,
-  postProject,
-  updateProject,
-  deleteProject,
-} from "../service/ProjectService";
-import { useReducer } from "react";
+  fetchProjectsAsync,
+  postProjectAsync,
+  updateProjectAsync,
+  deleteProjectAsync,
+} from "../slice/ProjectSlice";
+import { useDispatch, useSelector } from "react-redux";
 export const ProjectsContext = createContext();
+
 const ProjectContext = ({ children }) => {
-  const [selectedProject, setSelectedProject] = useState({});
-  const [isProject, setIsProject] = useState(false);
-  const [showProjects, setShowProjects] = useState(false);
+  const dispatch = useDispatch();
+  const allProjects = useSelector((state) => state.projects.projects);
   const [newProject, setNewProject] = useState({
     name: "",
     color: "charcoal",
@@ -38,104 +38,42 @@ const ProjectContext = ({ children }) => {
     grey: "#b8b8b8",
     taupe: "#ccac93",
   };
-  const [collapsed, setCollapsed] = useState(false);
-  const [projectName, setProjectName] = useState("");
-  const projectInitialState = { projects: [] };
-  const projectReducer = (state, action) => {
-    switch (action.type) {
-      case "fetchProject":
-        return { ...state, projects: action.payload };
-      case "postProject":
-        return { ...state, projects: [...state.projects, action.payload] };
-      case "updateProject":
-        return {
-          ...state,
-          projects: state.projects.map((project) =>
-            project.id === action.payload.id ? action.payload : project
-          ),
-        };
-      case "deleteProject":
-        return {
-          ...state,
-          projects: state.projects.filter(
-            (project) => project.id !== action.payload
-          ),
-        };
-      default:
-        return state;
-    }
-  };
-  const [state, dispatch] = useReducer(projectReducer, projectInitialState);
 
-  const toggleSidebar = () => {
-    setCollapsed(!collapsed);
-  };
-  const fetchInitialProjectData = async () => {
-    try {
-      const ProjectData = await fetchProjects();
-      dispatch({ type: "fetchProject", payload: ProjectData });
-    } catch (err) {
-      console.error("Error fetching data:", err);
-    }
-  };
-  const saveProject = async () => {
-    try {
-      const createdProject = await postProject(newProject);
-      dispatch({ type: "postProject", payload: createdProject });
-    } catch (error) {
-      console.error("Failed to create project:", error);
-    }
-  };
-  const editedProject = async (id, newProject) => {
-    try {
-      const updatedProject = await updateProject(id, newProject);
-      dispatch({ type: "updateProject", payload: updatedProject });
-      setNewProject({
-        name: "",
-        color: "charcoal",
-        is_favorite: false,
-      });
-      setIsProject(false);
-    } catch (error) {
-      console.error("Failed to update project:", error);
-    }
-  };
-  const removeProject = async (projectId) => {
-    try {
-      console.log("Deleting project with ID:", projectId);
-      await deleteProject(projectId);
-      dispatch({ type: "deleteProject", payload: projectId });
-    } catch (error) {
-      console.error("Failed to delete project:", error);
-    }
-  };
-
-  const handleColorChange = (value) => {
-    setNewProject({ ...newProject, color: value });
-  };
   useEffect(() => {
     fetchInitialProjectData();
   }, []);
+  const fetchInitialProjectData = async () => {
+    dispatch(fetchProjectsAsync());
+  };
+  const saveProject = () => {
+    dispatch(postProjectAsync(newProject));
+    setNewProject({
+      name: "",
+      color: "charcoal",
+      is_favorite: false,
+    });
+  };
+
+  const editedProject = (id, newProject) => {
+    dispatch(updateProjectAsync({ id, newProject }));
+    setNewProject({
+      name: "",
+      color: "charcoal",
+      is_favorite: false,
+    });
+  };
+
+  const removeProject = (projectId) => {
+    dispatch(deleteProjectAsync(projectId));
+  };
   return (
     <ProjectsContext.Provider
       value={{
-        allProjects: state.projects,
-        dispatch: projectInitialState,
+        allProjects,
         fetchInitialProjectData,
-        selectedProject,
-        setSelectedProject,
         colorMapping,
-        handleColorChange,
-        isProject,
-        setIsProject,
         newProject,
         setNewProject,
-        collapsed,
-        toggleSidebar,
-        showProjects,
-        setShowProjects,
-        projectName,
-        setProjectName,
         removeProject,
         editedProject,
         saveProject,
