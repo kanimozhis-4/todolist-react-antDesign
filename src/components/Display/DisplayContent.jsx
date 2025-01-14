@@ -24,7 +24,6 @@ const DisplayContent = ({ collapsed, setCollapsed }) => {
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [selectedProject, setSelectedProject] = useState({});
   let projectName = "Inbox";
-  console.log(selectedProject);
   const fetchInitialData = async () => {
     await fetchInitialProjectData();
     const project = allProjects.find((project) => project.id === id);

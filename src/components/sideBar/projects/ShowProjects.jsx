@@ -19,31 +19,36 @@ const ShowProjects = ({ show, isProject, setIsProject }) => {
   const [activeTooltip, setActiveTooltip] = useState(null);
   const [showOption, setShowOption] = useState(false);
   const handleEdit = (project) => {
+    
     setNewProject({
-      ...newProject,
-      id: project.id,
+      id: project.project_id,
       name: project.name,
       color: project.color,
-      is_favorite: project.isFavorite,
+      is_favorite: project.isFavorite||false,
     });
+    console.log("projectttt",project)
     setActiveTooltip(null);
     setIsProject(true);
   };
   const handleFavorites = async (project) => {
     try {
-      const updatedProject = {
-        ...project,
-        isFavorite: !project.isFavorite,
-      };
+      console.log("ppppppppppppp",project)
+      // const updatedProject = {
+      //   ...project,
+      //   isFavorite:!newProject.is_favorite,
+      // }; 
 
-      const id = updatedProject.id;
+      const id =project.project_id;
       const payload = {
-        name: updatedProject.name,
-        color: updatedProject.color,
-        is_favorite: updatedProject.isFavorite,
-      };
+        name: project.name,
+        color: project.color,
+        is_favorite: project.is_favorite===0?true :false,
+        user_id:10001
+        // project_id:updatedProject.project_id
+      }; 
+      console.log("idddddddd",id,payload)
       await editedProject(id, payload);
-      setIsProject(false);
+      // setIsProject(false);
 
       setActiveTooltip(null);
     } catch (error) {
@@ -52,7 +57,7 @@ const ShowProjects = ({ show, isProject, setIsProject }) => {
   };
   const handleItemClick = (project) => {
     setSelectedProject(project);
-    navigate(`/project/${project.id}`);
+    navigate(`/project/${project.project_id}`);
   };
 
   return (
@@ -62,10 +67,11 @@ const ShowProjects = ({ show, isProject, setIsProject }) => {
           return;
         }
         const hexColor = colorMapping[project?.color] || "#000000";
-        if (show === "all" || project.isFavorite)
+        if (show === "all" || project.is_favorite===1) 
+          // console.log("project",project)
           return (
             <div
-              key={project.id}
+              key={project.project_id}
               className={`text-black 
                   ${
                     selectedProject?.name === project?.name
@@ -84,15 +90,16 @@ const ShowProjects = ({ show, isProject, setIsProject }) => {
               <EllipsisOutlined
                 className="opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer float-right "
                 onClick={() => {
+                  console.log("in click project ",project)
                   setActiveTooltip(
-                    activeTooltip?.id === project.id
+                    activeTooltip?.id === project.project_id
                       ? null
-                      : { name: show, id: project.id }
+                      : { name: show, id: project.project_id }
                   );
                   setShowOption(!showOption);
                 }}
               />
-              {activeTooltip?.id === project.id &&
+              {activeTooltip?.id === project.project_id &&
                 activeTooltip?.name === show && (
                   <Tooltip
                     title={
@@ -113,7 +120,7 @@ const ShowProjects = ({ show, isProject, setIsProject }) => {
                         >
                           ⭐{" "}
                           <span className="ml-2">
-                            {project.isFavorite
+                            {project.is_favorite===1
                               ? "Remove from Favorite"
                               : "Add from Favorite"}
                           </span>
@@ -121,7 +128,8 @@ const ShowProjects = ({ show, isProject, setIsProject }) => {
                         <div
                           className="cursor-pointer p-2 hover:bg-gray-100 rounded"
                           onClick={() => {
-                            removeProject(project.id);
+                            removeProject(project.project_id);
+                            setActiveTooltip(null);
                           }}
                         >
                           🗑️ <span className="ml-2">Delete</span>

@@ -16,6 +16,7 @@ const TaskContext = ({ children }) => {
     description: "",
     due_date: "",
     project_id: null,
+    user_id:10001
   });
   useEffect(() => {
     fetchInitialTaskData();
@@ -30,6 +31,7 @@ const TaskContext = ({ children }) => {
       description: "",
       due_date: "",
       project_id: "",
+      user_id:10001
     });
   };
   const editedTask = (id, updatedTask) => {
@@ -39,6 +41,7 @@ const TaskContext = ({ children }) => {
       description: "",
       due_date: "",
       project_id: "",
+      user_id:10001
     });
   };
   const removeTask = (taskId) => {

@@ -10,20 +10,22 @@ export const fetchProjectsAsync = createAsyncThunk(
   "projects/fetchProjects",
   async () => {
     const response = await fetchProjects();
-    return response;
+    return response.data;
   }
 );
 export const postProjectAsync = createAsyncThunk(
   "projects/postProject",
   async (newProject) => {
     const response = await postProject(newProject);
-    return response;
+    return response.data;
   }
 );
 export const updateProjectAsync = createAsyncThunk(
   "projects/updateProject",
-  async ({ id, newProject }) => {
+  async ( {id, newProject }) => {
+    console.log(id,newProject,"qqqqqqqqqqqqqqqqqqq")
     const response = await updateProject(id, newProject);
+   
 
     return response;
   }
@@ -47,19 +49,31 @@ const projectSlice = createSlice({
         state.projects = action.payload;
       })
       .addCase(postProjectAsync.fulfilled, (state, action) => {
-        state.projects.push(action.payload);
+        console.log("payload",action.payload)
+        state.projects.push(action.payload)
+        // state.projects.push({name:action.payload.name,color:action.payload.color,is_favorite:action.payload.is_favorite});
       })
       .addCase(updateProjectAsync.fulfilled, (state, action) => {
-        const index = state.projects.findIndex(
-          (project) => project.id === action.payload.id
-        );
-        if (index >= 0) {
-          state.projects[index] = action.payload;
-        }
+        state.projects = state.projects.map(project => {
+          if (project.project_id ==action.payload.id) {
+            return { 
+              ...project,
+              name: action.payload.data.name || project.name,
+              color: action.payload.data.color || project.color,
+              is_favorite: action.payload.data.is_favorite === true ? 1 : 0
+            };
+          }
+          return project;
+        });
       })
+      
       .addCase(deleteProjectAsync.fulfilled, (state, action) => {
         state.projects = state.projects.filter(
-          (project) => project.id !== action.payload
+          (project) => { 
+            if(project.project_id != action.payload){
+            return project
+          }  
+        }
         );
       });
   },
