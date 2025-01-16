@@ -5,7 +5,6 @@ import ProjectForm from "./ProjectForm";
 const Projects = () => {
   const [isProject, setIsProject] = useState(false);
   const [showProjects, setShowProjects] = useState(false);
-
   return (
     <div>
       <div className="flex flex-row justify-between cursor-pointer">
@@ -29,7 +28,6 @@ const Projects = () => {
             <DownOutlined
               className="text-gray-500"
               onClick={(e) => {
-                console.log("clicked");
                 setShowProjects(!showProjects);
               }}
             />

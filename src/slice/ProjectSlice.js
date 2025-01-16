@@ -23,10 +23,7 @@ export const postProjectAsync = createAsyncThunk(
 export const updateProjectAsync = createAsyncThunk(
   "projects/updateProject",
   async ( {id, newProject }) => {
-    console.log(id,newProject,"qqqqqqqqqqqqqqqqqqq")
     const response = await updateProject(id, newProject);
-   
-
     return response;
   }
 );
@@ -49,9 +46,7 @@ const projectSlice = createSlice({
         state.projects = action.payload;
       })
       .addCase(postProjectAsync.fulfilled, (state, action) => {
-        console.log("payload",action.payload)
         state.projects.push(action.payload)
-        // state.projects.push({name:action.payload.name,color:action.payload.color,is_favorite:action.payload.is_favorite});
       })
       .addCase(updateProjectAsync.fulfilled, (state, action) => {
         state.projects = state.projects.map(project => {

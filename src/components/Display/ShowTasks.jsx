@@ -11,10 +11,9 @@ const ShowTasks = ({ projectId,selectedProject , setEditingTaskId, editingTaskId
   const defaultProjectId = "2345640986";
   let task = allTask?.filter((task) =>
     projectId
-      ? task.projectId === projectId
-      : task.projectId === defaultProjectId
+      ? task.project_id == projectId
+      : task.project_id == defaultProjectId
   );
-
   const handleMouseEnter = (id) => {
     setHoveredTaskId(id);
   };
@@ -32,33 +31,33 @@ const ShowTasks = ({ projectId,selectedProject , setEditingTaskId, editingTaskId
   return (
     <div className="flex flex-col space-y-4">
       {task.map((task) =>
-        editingTaskId === task.id ? (
-          <TaskForm key={task.id} taskId={task.id} projectId={projectId} selectedProject={selectedProject} setEditingTaskId={setEditingTaskId}/>
+        editingTaskId == task.task_id ? (
+          <TaskForm  key={`form-${task.task_id}`} taskId={task.task_id} projectId={projectId} selectedProject={selectedProject} setEditingTaskId={setEditingTaskId}/>
         ) : (
           <div
-            key={task.id}
+          key={`task-${task.task_id}`}
             className="flex space-x-4 justify-between"
-            onMouseEnter={() => handleMouseEnter(task.id)}
+            onMouseEnter={() => handleMouseEnter(task.task_id)}
             onMouseLeave={handleMouseLeave}
           >
             <div className="flex space-x-4">
               <Checkbox
                 className="circular-checkbox "
-                onChange={() => handleCheckbox(task.id)}
+                onChange={() => handleCheckbox(task.task_id)}
               />
               <span>{task?.content}</span>
             </div>
-            {hoveredTaskId === task.id && (
+            {hoveredTaskId === task.task_id && (
               <div className="ml-auto flex space-x-3">
                 <EditOutlined
                   className="text-gray-500 cursor-pointer text-lg hover:scale-110"
                   title="Edit Task"
-                  onClick={() => setEditingTaskId(task.id)}
+                  onClick={() =>{setEditingTaskId(task.task_id)}}
                 />
                 <DeleteOutlined
                   className="text-gray-500 cursor-pointer text-lg hover:scale-110"
                   title="Delete Task"
-                  onClick={() => handleDelete(task.id)}
+                  onClick={() => handleDelete(task.task_id)}
                 />
               </div>
             )}

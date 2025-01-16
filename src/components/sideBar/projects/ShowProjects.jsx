@@ -26,17 +26,11 @@ const ShowProjects = ({ show, isProject, setIsProject }) => {
       color: project.color,
       is_favorite: project.isFavorite||false,
     });
-    console.log("projectttt",project)
     setActiveTooltip(null);
     setIsProject(true);
   };
   const handleFavorites = async (project) => {
     try {
-      console.log("ppppppppppppp",project)
-      // const updatedProject = {
-      //   ...project,
-      //   isFavorite:!newProject.is_favorite,
-      // }; 
 
       const id =project.project_id;
       const payload = {
@@ -44,11 +38,9 @@ const ShowProjects = ({ show, isProject, setIsProject }) => {
         color: project.color,
         is_favorite: project.is_favorite===0?true :false,
         user_id:10001
-        // project_id:updatedProject.project_id
       }; 
       console.log("idddddddd",id,payload)
       await editedProject(id, payload);
-      // setIsProject(false);
 
       setActiveTooltip(null);
     } catch (error) {
@@ -68,13 +60,12 @@ const ShowProjects = ({ show, isProject, setIsProject }) => {
         }
         const hexColor = colorMapping[project?.color] || "#000000";
         if (show === "all" || project.is_favorite===1) 
-          // console.log("project",project)
           return (
             <div
               key={project.project_id}
               className={`text-black 
                   ${
-                    selectedProject?.name === project?.name
+                    selectedProject?.project_id === project?.project_id
                       ? "bg-[#F4A460] rounded  text-red-700 "
                       : " hover:bg-gray-300 hover:rounded"
                   }
@@ -90,7 +81,6 @@ const ShowProjects = ({ show, isProject, setIsProject }) => {
               <EllipsisOutlined
                 className="opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer float-right "
                 onClick={() => {
-                  console.log("in click project ",project)
                   setActiveTooltip(
                     activeTooltip?.id === project.project_id
                       ? null

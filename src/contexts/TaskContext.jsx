@@ -10,7 +10,7 @@ import {
 export const TasksContext = createContext();
 const TaskContext = ({ children }) => {
   const dispatch = useDispatch();
-  const allTask = useSelector((state) => state.tasks.tasks);
+  const allTask = useSelector((state) => state.tasks.tasks) ||[];
   const [newTask, setNewTask] = useState({
     content: "",
     description: "",
@@ -25,7 +25,7 @@ const TaskContext = ({ children }) => {
     dispatch(fetchTasksAsync());
   };
   const addNewTask = async (newTask) => {
-    dispatch(createTaskAsync(newTask));
+    dispatch(createTaskAsync({...newTask,user_id:10001}));
     setNewTask({
       content: "",
       description: "",

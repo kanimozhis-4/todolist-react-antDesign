@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Layout, Button, Input } from "antd";
+import { Layout, Button, Input,Spin } from "antd";
 import {
   MenuOutlined,
   EllipsisOutlined,
@@ -23,19 +23,38 @@ const DisplayContent = ({ collapsed, setCollapsed }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [selectedProject, setSelectedProject] = useState({});
+  const [loading, setLoading] = useState(true);
   let projectName = "Inbox";
+  if(selectedProject){
+   
+    const project = allProjects?.filter((project) => project.project_id == id);
+    projectName=selectedProject[0]?.name||project[0]?.name||"Inbox"
+  }
   const fetchInitialData = async () => {
-    await fetchInitialProjectData();
-    const project = allProjects.find((project) => project.id === id);
-    if (project) {
-      setSelectedProject({ ...project });
+    setLoading(true);
+    try {
+      await fetchInitialProjectData();
+      const project = allProjects.filter((project) => project.project_id == id);
+      if (project) {
+        setSelectedProject(project);
+      }
+      await fetchInitialTaskData();
       projectName = project?.name;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
     }
-    await fetchInitialTaskData();
   };
   useEffect(() => {
     if (id) {
       fetchInitialData();
+     
+    } 
+    else{
+      if(allProjects){
+        setLoading(false)
+      }
     }
   }, [id]);
   const handleKeyPress = async (e) => {
@@ -54,7 +73,8 @@ const DisplayContent = ({ collapsed, setCollapsed }) => {
       });
       setSelectedProject({ ...selectedProject, name: projectName });
       setIsEditing(false);
-    }
+    } 
+    
   };
   return (
     <Layout className="min-h-screen ">
@@ -85,6 +105,11 @@ const DisplayContent = ({ collapsed, setCollapsed }) => {
         </Header>
 
         <Content>
+        {loading ? ( // Show loader if loading is true
+            <div className="flex justify-center items-center min-h-screen">
+              <Spin size="large" />
+            </div>
+          ) :(
           <div className="flex flex-col  ml-[25%] mr-[25%] space-y-4">
             {isEditing ? (
               <Input
@@ -106,8 +131,8 @@ const DisplayContent = ({ collapsed, setCollapsed }) => {
                 className="text-2xl font-bold"
                 onClick={() => setIsEditing(true)}
                 style={{ cursor: "pointer" }}
-              >
-                {selectedProject?.name || projectName}
+              > 
+                {projectName||selectedProject?.name }
               </span>
             )}
             <ShowTasks
@@ -125,14 +150,14 @@ const DisplayContent = ({ collapsed, setCollapsed }) => {
                     description: "",
                     due_date: "",
                     project_id: "",
-                  });
-                  setEditingTaskId("1");
+                  }); 
+                  setEditingTaskId("1")
                 }}
               />
               <h5 className={`text-gray-500`}>Add Task</h5>
             </div>
 
-            {editingTaskId === "1" && (
+            {editingTaskId == 1 && (
               <TaskForm
                 taskId={""}
                 projectId={id}
@@ -140,7 +165,7 @@ const DisplayContent = ({ collapsed, setCollapsed }) => {
                 setEditingTaskId={setEditingTaskId}
               />
             )}
-          </div>
+          </div>)}
         </Content>
       </Layout>
     </Layout>

@@ -10,7 +10,6 @@ const clientCall = async (endpoint, method = 'GET', payload=null) => {
         },
         data: payload
     }
-    console.log("response",config)
     const response = await axios(config);
     return response;
   } catch (error) {

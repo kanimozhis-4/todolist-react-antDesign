@@ -5,6 +5,10 @@ import moment from "moment";
 import _ from "lodash";
 import { DownOutlined, CheckOutlined } from "@ant-design/icons";
 import { TasksContext } from "../../contexts/TaskContext";
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+dayjs.extend(customParseFormat);
+const dateFormat = 'YYYY-MM-DD';
 const TaskForm = ({ taskId, projectId ,selectedProject,setEditingTaskId}) => {
   const { allProjects, colorMapping } =
     useContext(ProjectsContext);
@@ -21,27 +25,30 @@ const TaskForm = ({ taskId, projectId ,selectedProject,setEditingTaskId}) => {
   }); 
   
   let tempTask = {};
+  let taskToEdit={...newTask}
+  if (taskId) {
+     taskToEdit = allTask?.find((task) => task.task_id === taskId);
+    tempTask = {
+      content: taskToEdit.content,
+      description: taskToEdit.description,
+      due_date: taskToEdit.due_date ||null,
+      project_id: taskToEdit.project_id,
+      user_id:10001
+    }; 
+    console.log("temptask",taskToEdit)
+  }
   useEffect(() => {
     if (taskId) {
-      const taskToEdit = allTask.find((task) => task.id === taskId);
+      const taskToEdit = allTask.find((task) => task.task_id === taskId);
       if (taskToEdit) {
         setNewTask({
           content: taskToEdit.content,
           description: taskToEdit.description,
-          due_date: taskToEdit.due?.date
-            ? moment(taskToEdit.due.date, "YYYY-MM-DD")
-            : null,
+          due_date: taskToEdit?.due_date ||null,
           project_id: taskToEdit.project_id,
+          user_id:10001
         });
       }
-      tempTask = {
-        content: taskToEdit.content,
-        description: taskToEdit.description,
-        due_date: taskToEdit.due?.date
-          ? moment(taskToEdit.due.date, "YYYY-MM-DD")
-          : null,
-        project_id: taskToEdit.project_id,
-      };
     }
   }, []);
   const menuItems = allProjects.map((project) => ({
@@ -97,13 +104,9 @@ const TaskForm = ({ taskId, projectId ,selectedProject,setEditingTaskId}) => {
       ...prevTask,
       project_id: project.id,
     }));
-    console.log("Selected Project: ", selectedProject);
   };
   const handleInputChange = (value, field) => {
-    if (field === "due_date" && value) {
-      console.log("valueeee", value, moment(value));
-      value = moment(value);
-    }
+
     setNewTask((prevTask) => ({
       ...prevTask,
       [field]: value,
@@ -113,23 +116,29 @@ const TaskForm = ({ taskId, projectId ,selectedProject,setEditingTaskId}) => {
     const taskToSave = {
       ...newTask,
       project_id: projectId || "2345640986",
-      due_date: newTask.due_date
-        ? newTask.due_date.format("YYYY-MM-DD")
-        : null,
+      due_date: newTask?.due_date
+        || null,
     }; 
     if (taskId === "") {
       await addNewTask(taskToSave);
+      setEditingTaskId(null); 
     } else {
       await editedTask(taskId, newTask);
     }
     setEditingTaskId(null);
   };
   const handleEditCancel = async () => {
-    console.log("tempTask", tempTask);
     setNewTask({ ...tempTask });
 
     setEditingTaskId(null);
-  };
+  }; 
+  const handleInputDate=async (date,dateString)=>{
+    setNewTask((prevTask) => ({
+      ...prevTask,
+      "due_date": dateString,
+    })); 
+
+  }
 
   return (
     <Card
@@ -152,8 +161,8 @@ const TaskForm = ({ taskId, projectId ,selectedProject,setEditingTaskId}) => {
         />
         <DatePicker
           className="w-[25%] m-2"
-          value={newTask.due_date || null}
-          onChange={(date) => handleInputChange(date, "due_date")}
+          defaultValue={dayjs(taskToEdit.due_date||"2025-01-23", dateFormat)}
+          onChange={handleInputDate}
         />
         <hr />
         <div className="flex flex-row justify-between">

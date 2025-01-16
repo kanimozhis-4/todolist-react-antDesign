@@ -17,14 +17,14 @@ export const createTaskAsync = createAsyncThunk(
   "tasks/createTask",
   async (newTask) => {
     const response = await createTask(newTask);
-    return response;
+    return response.data;
   }
 );
 export const editTaskAsync = createAsyncThunk(
   "tasks/editTask",
   async ({ id, updatedTask }) => {
     const response = await editTask(id, updatedTask);
-    return response;
+    return response.data;
   }
 );
 export const deleteTaskAsync = createAsyncThunk(
@@ -50,24 +50,44 @@ const taskSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchTasksAsync.fulfilled, (state, action) => {
-        state.tasks = action.payload;
+        state.tasks = action.payload.data;
       })
       .addCase(createTaskAsync.fulfilled, (state, action) => {
-        state.tasks.push(action.payload);
+        const modifiedPayload = {
+          ...action.payload,
+          task_id: action.payload.id,  
+        };
+        
+        delete modifiedPayload.id;
+      
+        state.tasks.push(modifiedPayload);
       })
       .addCase(editTaskAsync.fulfilled, (state, action) => {
-        const index = state.tasks.findIndex(
-          (task) => task.id === action.payload.id
-        );
-        if (index >= 0) {
-          state.tasks[index] = action.payload;
-        }
+        state.tasks = state.tasks.map(task => {
+          if (task.task_id ==action.payload.data.task_id) {
+            return { ...action.payload.data}
+          }
+          return task;
+        });
       })
       .addCase(deleteTaskAsync.fulfilled, (state, action) => {
-        state.tasks = state.tasks.filter((task) => task.id !== action.payload);
+        state.tasks = state.tasks.filter(
+          (task) => { 
+            if(task.task_id != action.payload){
+            return task
+          }  
+        }
+        );
       })
       .addCase(closeTaskAsync.fulfilled, (state, action) => {
-        state.tasks = state.tasks.filter((task) => task.id !== action.payload);
+       
+        state.tasks = state.tasks.filter(
+          (task) => { 
+            if(task.task_id != action.payload){
+            return task
+          }  
+        }
+        );
       });
   },
 }); 
