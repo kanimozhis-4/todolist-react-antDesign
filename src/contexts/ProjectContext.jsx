@@ -6,13 +6,12 @@ import {
   deleteProjectAsync,
 } from "../slice/ProjectSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { VerticalAlignBottomOutlined } from "@ant-design/icons";
 export const ProjectsContext = createContext();
 
 const ProjectContext = ({ children }) => {
   const dispatch = useDispatch();
   const allProjects = useSelector((state) => state.projects.projects);
-  // console.log("allProject",allProjects)
+  const [showProjects, setShowProjects] = useState(false);
   const [newProject, setNewProject] = useState({
     name: "",
     color: "charcoal",
@@ -48,7 +47,7 @@ const ProjectContext = ({ children }) => {
     dispatch(fetchProjectsAsync());
   };
   const saveProject = () => {
-    dispatch(postProjectAsync({...newProject,user_id:10001}));
+    dispatch(postProjectAsync({ ...newProject }));
     setNewProject({
       name: "",
       color: "charcoal",
@@ -58,35 +57,26 @@ const ProjectContext = ({ children }) => {
 
   const editedProject = async (id, newProject) => {
     const project = {
-      user_id: 10001,
       name: newProject.name,
       color: newProject.color,
       is_favorite: newProject.is_favorite,
     };
-  
+
     try {
-      // Await the asynchronous dispatch
       await dispatch(updateProjectAsync({ id: id, newProject: project }));
-      
-      // Reset the newProject state after the async operation is complete
+
       setNewProject({
         name: "",
         color: "charcoal",
         is_favorite: false,
       });
-  
-      // Log the updated projects list
-      console.log("allproject", allProjects);
     } catch (error) {
-      // Handle any errors that occur during the async dispatch
-      console.error("Error updating project:", error);
+      console.log("Error updating project:", error);
     }
   };
-  
 
   const removeProject = (projectId) => {
     dispatch(deleteProjectAsync(projectId));
-    console.log("allproject", allProjects);
   };
   return (
     <ProjectsContext.Provider
@@ -99,6 +89,8 @@ const ProjectContext = ({ children }) => {
         removeProject,
         editedProject,
         saveProject,
+        setShowProjects,
+        showProjects,
       }}
     >
       {children}

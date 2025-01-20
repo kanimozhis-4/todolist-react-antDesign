@@ -1,19 +1,22 @@
 // services/client.js
-import axios from 'axios';
-const clientCall = async (endpoint, method = 'GET', payload=null) => {
-  try {  
-    const config={
-        url: endpoint,
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        data: payload
-    }
+import axios from "axios";
+const clientCall = async (endpoint, method = "GET", payload = null) => {
+  try {
+    const config = {
+      url: endpoint,
+      method,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: payload,
+      withCredentials: true,
+      credentials: "include",
+    };
     const response = await axios(config);
     return response;
   } catch (error) {
-    console.log('API call failed:', error.message);
+    console.log("API call failed:", error.message);
   }
-}; 
-export default clientCall
+};
+
+export default clientCall;

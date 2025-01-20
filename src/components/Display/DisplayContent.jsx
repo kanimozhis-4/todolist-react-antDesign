@@ -17,7 +17,7 @@ const { Content, Header } = Layout;
 
 const DisplayContent = ({ collapsed, setCollapsed }) => {
   const { id } = useParams();
-  const { allProjects, editedProject, fetchInitialProjectData } =
+  const { allProjects, editedProject, fetchInitialProjectData, } =
     useContext(ProjectsContext);
   const { setNewTask, fetchInitialTaskData } = useContext(TasksContext);
   const [isEditing, setIsEditing] = useState(false);
@@ -26,7 +26,7 @@ const DisplayContent = ({ collapsed, setCollapsed }) => {
   const [loading, setLoading] = useState(true);
   let projectName = "Inbox";
   if(selectedProject){
-   
+    
     const project = allProjects?.filter((project) => project.project_id == id);
     projectName=selectedProject[0]?.name||project[0]?.name||"Inbox"
   }
@@ -105,7 +105,7 @@ const DisplayContent = ({ collapsed, setCollapsed }) => {
         </Header>
 
         <Content>
-        {loading ? ( // Show loader if loading is true
+        {loading ? ( 
             <div className="flex justify-center items-center min-h-screen">
               <Spin size="large" />
             </div>
@@ -150,8 +150,13 @@ const DisplayContent = ({ collapsed, setCollapsed }) => {
                     description: "",
                     due_date: "",
                     project_id: "",
-                  }); 
+                  });  
+                  if(editingTaskId==1){
+                    setEditingTaskId("null")
+                  } 
+                  else{
                   setEditingTaskId("1")
+                  }
                 }}
               />
               <h5 className={`text-gray-500`}>Add Task</h5>
@@ -164,7 +169,8 @@ const DisplayContent = ({ collapsed, setCollapsed }) => {
                 selectedProject={selectedProject}
                 setEditingTaskId={setEditingTaskId}
               />
-            )}
+            )} 
+            
           </div>)}
         </Content>
       </Layout>

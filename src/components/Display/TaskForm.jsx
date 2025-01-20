@@ -33,9 +33,7 @@ const TaskForm = ({ taskId, projectId ,selectedProject,setEditingTaskId}) => {
       description: taskToEdit.description,
       due_date: taskToEdit.due_date ||null,
       project_id: taskToEdit.project_id,
-      user_id:10001
     }; 
-    console.log("temptask",taskToEdit)
   }
   useEffect(() => {
     if (taskId) {
@@ -46,7 +44,6 @@ const TaskForm = ({ taskId, projectId ,selectedProject,setEditingTaskId}) => {
           description: taskToEdit.description,
           due_date: taskToEdit?.due_date ||null,
           project_id: taskToEdit.project_id,
-          user_id:10001
         });
       }
     }
@@ -86,7 +83,7 @@ const TaskForm = ({ taskId, projectId ,selectedProject,setEditingTaskId}) => {
   let selectedProjectColor = "";
   if (selectedProject != "") {
     const project = allProjects.find(
-      (project) => project.name === selectedProject.name
+      (project) => project.name === selectedProject[0]?.name
     );
     selectedProjectColor = project?.color;
   }
@@ -98,8 +95,8 @@ const TaskForm = ({ taskId, projectId ,selectedProject,setEditingTaskId}) => {
     const selectedProject = {
       name: projectName.key,
       color: project.color,
-    };
-    setSelectedProjectName(selectedProject);
+    }; 
+    setSelectedProjectName({...selectedProject});
     setNewTask((prevTask) => ({
       ...prevTask,
       project_id: project.id,
@@ -161,7 +158,7 @@ const TaskForm = ({ taskId, projectId ,selectedProject,setEditingTaskId}) => {
         />
         <DatePicker
           className="w-[25%] m-2"
-          defaultValue={dayjs(taskToEdit.due_date||"2025-01-23", dateFormat)}
+          defaultValue={taskToEdit.due_date ? dayjs(taskToEdit.due_date, dateFormat) : undefined}
           onChange={handleInputDate}
         />
         <hr />
@@ -179,13 +176,13 @@ const TaskForm = ({ taskId, projectId ,selectedProject,setEditingTaskId}) => {
                   <span>
                     <span
                       style={{
-                        color: colorMapping[selectedProjectName.color],
+                        color: colorMapping[selectedProjectName?.color],
                         marginRight: "8px",
                       }}
                     >
                       #
                     </span>
-                    {selectedProjectName.name}
+                    {selectedProjectName?.name}
                   </span>
                 ) : (
                   <>
@@ -201,7 +198,7 @@ const TaskForm = ({ taskId, projectId ,selectedProject,setEditingTaskId}) => {
                         >
                           #
                         </span>
-                        {selectedProject.name}
+                        {selectedProject[0]?.name}
                       </span>
                     )}
                   </>

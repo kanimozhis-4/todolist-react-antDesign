@@ -19,27 +19,23 @@ const ShowProjects = ({ show, isProject, setIsProject }) => {
   const [activeTooltip, setActiveTooltip] = useState(null);
   const [showOption, setShowOption] = useState(false);
   const handleEdit = (project) => {
-    
     setNewProject({
       id: project.project_id,
       name: project.name,
       color: project.color,
-      is_favorite: project.isFavorite||false,
+      is_favorite: project.isFavorite || false,
     });
     setActiveTooltip(null);
     setIsProject(true);
   };
   const handleFavorites = async (project) => {
     try {
-
-      const id =project.project_id;
+      const id = project.project_id;
       const payload = {
         name: project.name,
         color: project.color,
-        is_favorite: project.is_favorite===0?true :false,
-        user_id:10001
-      }; 
-      console.log("idddddddd",id,payload)
+        is_favorite: project.is_favorite === 0 ? true : false,
+      };
       await editedProject(id, payload);
 
       setActiveTooltip(null);
@@ -48,24 +44,21 @@ const ShowProjects = ({ show, isProject, setIsProject }) => {
     }
   };
   const handleItemClick = (project) => {
-    setSelectedProject(project);
+    setSelectedProject({ ...project });
     navigate(`/project/${project.project_id}`);
   };
 
   return (
     <div className="flex flex-col space-y-2 mt-2">
       {allProjects.map((project, index) => {
-        if (index == 0) {
-          return;
-        }
         const hexColor = colorMapping[project?.color] || "#000000";
-        if (show === "all" || project.is_favorite===1) 
+        if (show === "all" || project.is_favorite === 1)
           return (
             <div
               key={project.project_id}
               className={`text-black 
                   ${
-                    selectedProject?.project_id === project?.project_id
+                    selectedProject?.project_id == project?.project_id
                       ? "bg-[#F4A460] rounded  text-red-700 "
                       : " hover:bg-gray-300 hover:rounded"
                   }
@@ -110,7 +103,7 @@ const ShowProjects = ({ show, isProject, setIsProject }) => {
                         >
                           ⭐{" "}
                           <span className="ml-2">
-                            {project.is_favorite===1
+                            {project.is_favorite === 1
                               ? "Remove from Favorite"
                               : "Add from Favorite"}
                           </span>

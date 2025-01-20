@@ -10,7 +10,11 @@ const ProjectForm = ({ isVisible, setIsProject }) => {
     editedProject,
     saveProject,
   } = useContext(ProjectsContext);
-  const tempProject = { ...newProject };
+  const tempProject = {
+    name: newProject.name,
+    color: newProject.color,
+    is_favorite: newProject.is_favorite,
+  };
 
   return (
     <Modal
@@ -46,6 +50,7 @@ const ProjectForm = ({ isVisible, setIsProject }) => {
           className="bg-red-700"
           disabled={newProject.name === ""}
           onClick={() => {
+            setNewProject({ name: "", color: "charcoal", is_favorite: false });
             newProject?.id
               ? editedProject(newProject?.id, newProject)
               : saveProject();
@@ -78,7 +83,7 @@ const ProjectForm = ({ isVisible, setIsProject }) => {
           validateTrigger={["onBlur", "onChange"]}
         >
           <Input
-            value={newProject.name}
+            value={newProject?.name}
             onChange={(e) =>
               setNewProject({ ...newProject, name: e.target.value })
             }
@@ -90,7 +95,7 @@ const ProjectForm = ({ isVisible, setIsProject }) => {
         >
           <Select
             style={{ width: 200 }}
-            value={newProject.color}
+            value={newProject?.color}
             onChange={(value) => setNewProject({ ...newProject, color: value })}
             placeholder="Select a color"
           >

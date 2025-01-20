@@ -10,13 +10,12 @@ import {
 export const TasksContext = createContext();
 const TaskContext = ({ children }) => {
   const dispatch = useDispatch();
-  const allTask = useSelector((state) => state.tasks.tasks) ||[];
+  const allTask = useSelector((state) => state.tasks.tasks) || [];
   const [newTask, setNewTask] = useState({
     content: "",
     description: "",
     due_date: "",
     project_id: null,
-    user_id:10001
   });
   useEffect(() => {
     fetchInitialTaskData();
@@ -25,13 +24,12 @@ const TaskContext = ({ children }) => {
     dispatch(fetchTasksAsync());
   };
   const addNewTask = async (newTask) => {
-    dispatch(createTaskAsync({...newTask,user_id:10001}));
+    dispatch(createTaskAsync({ ...newTask }));
     setNewTask({
       content: "",
       description: "",
       due_date: "",
       project_id: "",
-      user_id:10001
     });
   };
   const editedTask = (id, updatedTask) => {
@@ -41,7 +39,6 @@ const TaskContext = ({ children }) => {
       description: "",
       due_date: "",
       project_id: "",
-      user_id:10001
     });
   };
   const removeTask = (taskId) => {

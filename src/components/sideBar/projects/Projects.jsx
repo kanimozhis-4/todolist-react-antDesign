@@ -1,10 +1,11 @@
-import React, { useState} from "react";
+import React, { useContext, useState } from "react";
 import { RightOutlined, PlusOutlined, DownOutlined } from "@ant-design/icons";
 import ShowProjects from "./ShowProjects";
 import ProjectForm from "./ProjectForm";
+import { ProjectsContext } from "../../../contexts/ProjectContext";
 const Projects = () => {
   const [isProject, setIsProject] = useState(false);
-  const [showProjects, setShowProjects] = useState(false);
+  const { showProjects, setShowProjects } = useContext(ProjectsContext);
   return (
     <div>
       <div className="flex flex-row justify-between cursor-pointer">
