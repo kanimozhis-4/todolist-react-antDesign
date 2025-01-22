@@ -50,10 +50,11 @@ const ProjectForm = ({ isVisible, setIsProject }) => {
           className="bg-red-700"
           disabled={newProject.name === ""}
           onClick={() => {
-            setNewProject({ name: "", color: "charcoal", is_favorite: false });
+            
             newProject?.id
               ? editedProject(newProject?.id, newProject)
               : saveProject();
+            setNewProject({ name: "", color: "charcoal", is_favorite: false });
             setIsProject(false);
           }}
           style={{

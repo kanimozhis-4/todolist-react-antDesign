@@ -1,9 +1,9 @@
 import React, { useContext, useState } from 'react'
-import { Form, Input, Button ,Card} from 'antd';
+import { Form, Input, Button ,Card,Spin,Alert} from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { UsersContext } from '../contexts/UserContext';
-import { useSelector } from 'react-redux';
-import { useNavigate ,Link} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 
 const LogIn = () => {
   const {logInUser}=useContext(UsersContext);
@@ -19,9 +19,11 @@ const LogIn = () => {
       navigate('/homepage');
        
     }
-  };
+  }; 
+  const isLoading = status === 'loading';
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100">
+       <Spin spinning={isLoading} size="large" className="absolute inset-0 flex justify-center items-center">
       <Card className="w-96 p-6 shadow-lg">
         <Form
           name="Login"
@@ -56,6 +58,9 @@ const LogIn = () => {
               onChange={(e) => setLoginData(prev => ({ ...prev, password_code: e.target.value }))}
             />
           </Form.Item>
+          {status === 'failed' && (
+              <Alert message={"Invalid data"} type="error" showIcon className="mb-4" />
+          )}
           <Form.Item className="text-center">
             <Button type="primary" htmlType="submit" className="signin-button w-full">
               Log In
@@ -69,7 +74,8 @@ const LogIn = () => {
             Create New Account
           </Button>
         </div>
-      </Card>
+      </Card> 
+      </Spin>
     </div>
   );
 }

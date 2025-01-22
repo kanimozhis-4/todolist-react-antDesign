@@ -40,9 +40,16 @@ const userSlice =createSlice({
             state.status = 'failed';
             state.error = action.payload;
           })
+          .addCase(sigInUserAsync.pending, (state) => {
+            state.status = 'loading';
+          })
           .addCase(sigInUserAsync.fulfilled,(state, action)=>{
             state.status = 'succeeded';
+          }) 
+          .addCase(sigInUserAsync.rejected,(state)=>{
+            state.status = 'failed';
           })
+          
       },
 
 }) 

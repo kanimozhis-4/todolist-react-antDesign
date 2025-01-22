@@ -52,7 +52,7 @@ const ShowProjects = ({ show, isProject, setIsProject }) => {
     <div className="flex flex-col space-y-2 mt-2">
       {allProjects.map((project, index) => {
         const hexColor = colorMapping[project?.color] || "#000000";
-        if (show === "all" || project.is_favorite === 1)
+        if (show === "all" || project.is_favorite === 1 || project.is_favorite==true)
           return (
             <div
               key={project.project_id}
