@@ -17,6 +17,7 @@ export const createTaskAsync = createAsyncThunk(
   "tasks/createTask",
   async (newTask) => {
     const response = await createTask(newTask);
+    console.log("responseeee", response.data);
     return response.data;
   }
 );
@@ -55,40 +56,32 @@ const taskSlice = createSlice({
       .addCase(createTaskAsync.fulfilled, (state, action) => {
         const modifiedPayload = {
           ...action.payload,
-          task_id: action.payload.id,  
         };
-        
-        delete modifiedPayload.id;
-      
+
         state.tasks.push(modifiedPayload);
       })
       .addCase(editTaskAsync.fulfilled, (state, action) => {
-        state.tasks = state.tasks.map(task => {
-          if (task.task_id ==action.payload.data.task_id) {
-            return { ...action.payload.data}
+        state.tasks = state.tasks.map((task) => {
+          if (task.task_id == action.payload.data.task_id) {
+            return { ...action.payload.data };
           }
           return task;
         });
       })
       .addCase(deleteTaskAsync.fulfilled, (state, action) => {
-        state.tasks = state.tasks.filter(
-          (task) => { 
-            if(task.task_id != action.payload){
-            return task
-          }  
-        }
-        );
+        state.tasks = state.tasks.filter((task) => {
+          if (task.task_id != action.payload) {
+            return task;
+          }
+        });
       })
       .addCase(closeTaskAsync.fulfilled, (state, action) => {
-       
-        state.tasks = state.tasks.filter(
-          (task) => { 
-            if(task.task_id != action.payload){
-            return task
-          }  
-        }
-        );
+        state.tasks = state.tasks.filter((task) => {
+          if (task.task_id != action.payload) {
+            return task;
+          }
+        });
       });
   },
-}); 
+});
 export default taskSlice.reducer;

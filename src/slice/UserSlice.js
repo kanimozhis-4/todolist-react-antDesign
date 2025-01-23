@@ -21,6 +21,7 @@ const userSlice =createSlice({
     name:"user",
     initialState: {
         user: null,
+        email:null,
         status: 'idle',
         error: null,
       }, 
@@ -33,6 +34,7 @@ const userSlice =createSlice({
             state.status = 'succeeded';
            
             state.user = action.payload.token;
+            state.email=action.payload.email;
             state.error = null;
             
           })

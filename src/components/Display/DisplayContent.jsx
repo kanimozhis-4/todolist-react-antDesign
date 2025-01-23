@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Layout, Button, Input,Spin } from "antd";
+import { Layout, Button, Input, Spin } from "antd";
 import {
   MenuOutlined,
   EllipsisOutlined,
@@ -12,34 +12,38 @@ import ShowTasks from "./ShowTasks";
 import SideBar from "../SideBar";
 import { useParams } from "react-router-dom";
 import { TasksContext } from "../../contexts/TaskContext";
+import { useDispatch, useSelector } from "react-redux";
+import { setSelectedProject } from "../../slice/ProjectSlice";
 
 const { Content, Header } = Layout;
 
 const DisplayContent = ({ collapsed, setCollapsed }) => {
   const { id } = useParams();
-  const { allProjects, editedProject, fetchInitialProjectData, } =
+  const dispatch = useDispatch();
+  const { allProjects, editedProject, fetchInitialProjectData } =
     useContext(ProjectsContext);
+  const selectedProject = useSelector(
+    (state) => state.projects.selectedProject
+  );
   const { setNewTask, fetchInitialTaskData } = useContext(TasksContext);
   const [isEditing, setIsEditing] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState(null);
-  const [selectedProject, setSelectedProject] = useState({});
   const [loading, setLoading] = useState(true);
-  let projectName = "Inbox";
-  if(selectedProject){
-    
-    const project = allProjects?.filter((project) => project.project_id == id);
-    projectName=selectedProject[0]?.name||project[0]?.name||"Inbox"
+  let projectName = selectedProject?.name || "Inbox";
+
+  if (allProjects) {
+    const project = allProjects?.find((project) => project.project_id == id);
+    projectName = project?.name || "Inbox";
   }
   const fetchInitialData = async () => {
     setLoading(true);
     try {
       await fetchInitialProjectData();
-      const project = allProjects.filter((project) => project.project_id == id);
+      const project = allProjects?.find((project) => project.project_id == id);
       if (project) {
-        setSelectedProject(project);
+        dispatch(setSelectedProject({ ...project }));
       }
       await fetchInitialTaskData();
-      projectName = project?.name;
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -49,11 +53,9 @@ const DisplayContent = ({ collapsed, setCollapsed }) => {
   useEffect(() => {
     if (id) {
       fetchInitialData();
-     
-    } 
-    else{
-      if(allProjects){
-        setLoading(false)
+    } else {
+      if (allProjects) {
+        setLoading(false);
       }
     }
   }, [id]);
@@ -65,16 +67,9 @@ const DisplayContent = ({ collapsed, setCollapsed }) => {
         is_favorite: selectedProject.isFavorite,
       };
       await editedProject(id, payload);
-      const project = allProjects.map((project) => {
-        if (project.id === id) {
-          return payload;
-        }
-        return project;
-      });
-      setSelectedProject({ ...selectedProject, name: projectName });
+      dispatch(setSelectedProject({ ...selectedProject, name: projectName }));
       setIsEditing(false);
-    } 
-    
+    }
   };
   return (
     <Layout className="min-h-screen ">
@@ -105,73 +100,70 @@ const DisplayContent = ({ collapsed, setCollapsed }) => {
         </Header>
 
         <Content>
-        {loading ? ( 
+          {loading ? (
             <div className="flex justify-center items-center min-h-screen">
               <Spin size="large" />
             </div>
-          ) :(
-          <div className="flex flex-col  ml-[25%] mr-[25%] space-y-4">
-            {isEditing ? (
-              <Input
-                className="text-2xl font-bold"
-                value={projectName}
-                onChange={(e) => {
-                  setSelectedProject({
-                    ...selectedProject,
-                    name: e.target.value,
-                  });
-                  projectName = e.target.value;
-                }}
-                onBlur={() => setIsEditing(false)}
-                onPressEnter={handleKeyPress}
-                autoFocus
-              />
-            ) : (
-              <span
-                className="text-2xl font-bold"
-                onClick={() => setIsEditing(true)}
-                style={{ cursor: "pointer" }}
-              > 
-                {projectName||selectedProject?.name }
-              </span>
-            )}
-            <ShowTasks
-              projectId={id}
-              selectedProject={selectedProject}
-              editingTaskId={editingTaskId}
-              setEditingTaskId={setEditingTaskId}
-            />
-            <div className="flex flex-row space-x-2">
-              <PlusOutlined
-                className="text-red-500"
-                onClick={() => {
-                  setNewTask({
-                    content: "",
-                    description: "",
-                    due_date: "",
-                    project_id: "",
-                  });  
-                  if(editingTaskId==1){
-                    setEditingTaskId("null")
-                  } 
-                  else{
-                  setEditingTaskId("1")
-                  }
-                }}
-              />
-              <h5 className={`text-gray-500`}>Add Task</h5>
-            </div>
-
-            {editingTaskId == 1 && (
-              <TaskForm
-                taskId={""}
+          ) : (
+            <div className="flex flex-col  ml-[25%] mr-[25%] space-y-4">
+              {isEditing ? (
+                <Input
+                  className="text-2xl font-bold"
+                  value={projectName}
+                  onChange={(e) => {
+                    dispatch(
+                      setSelectedProject({
+                        ...selectedProject,
+                        name: e.target.value,
+                      })
+                    );
+                    projectName = e.target.value;
+                  }}
+                  onBlur={() => setIsEditing(false)}
+                  onPressEnter={handleKeyPress}
+                  autoFocus
+                />
+              ) : (
+                <span
+                  className="text-2xl font-bold"
+                  onClick={() => setIsEditing(true)}
+                  style={{ cursor: "pointer" }}
+                >
+                  {projectName || selectedProject?.name}
+                </span>
+              )}
+              <ShowTasks
                 projectId={id}
                 selectedProject={selectedProject}
+                editingTaskId={editingTaskId}
                 setEditingTaskId={setEditingTaskId}
               />
-            )} 
-            
-          </div>)}
+              <div className="flex flex-row space-x-2">
+                <PlusOutlined
+                  className="text-red-500"
+                  onClick={() => {
+                    setNewTask({
+                      content: "",
+                      description: "",
+                      due_date: "",
+                      project_id: "",
+                    });
+                    setEditingTaskId("1");
+                  }}
+                />
+                <h5 className={`text-gray-500`}>Add Task</h5>
+              </div>
+
+              {editingTaskId == 1 && (
+                <TaskForm
+                  taskId={""}
+                  projectId={id}
+                  selectedProject={selectedProject}
+                  setEditingTaskId={setEditingTaskId}
+                />
+              )}
+            </div>
+          )}
         </Content>
       </Layout>
     </Layout>

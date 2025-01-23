@@ -22,7 +22,7 @@ export const postProjectAsync = createAsyncThunk(
 );
 export const updateProjectAsync = createAsyncThunk(
   "projects/updateProject",
-  async ( {id, newProject }) => {
+  async ({ id, newProject }) => {
     const response = await updateProject(id, newProject);
     return response;
   }
@@ -39,6 +39,12 @@ const projectSlice = createSlice({
   name: "projects",
   initialState: {
     projects: [],
+    selectedProject: null,
+  },
+  reducers: {
+    setSelectedProject: (state, action) => {
+      state.selectedProject = action.payload || null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -46,31 +52,30 @@ const projectSlice = createSlice({
         state.projects = action.payload;
       })
       .addCase(postProjectAsync.fulfilled, (state, action) => {
-        state.projects.push(action.payload)
+        state.projects.push(action.payload);
       })
       .addCase(updateProjectAsync.fulfilled, (state, action) => {
-        state.projects = state.projects.map(project => {
-          if (project.project_id ==action.payload.id) {
-            return { 
+        state.projects = state.projects.map((project) => {
+          if (project.project_id == action.payload.id) {
+            return {
               ...project,
               name: action.payload.data.name || project.name,
               color: action.payload.data.color || project.color,
-              is_favorite: action.payload.data.is_favorite === true ? 1 : 0
+              is_favorite: action.payload.data.is_favorite === true ? 1 : 0,
             };
           }
           return project;
         });
       })
-      
+
       .addCase(deleteProjectAsync.fulfilled, (state, action) => {
-        state.projects = state.projects.filter(
-          (project) => { 
-            if(project.project_id != action.payload){
-            return project
-          }  
-        }
-        );
+        state.projects = state.projects.filter((project) => {
+          if (project.project_id != action.payload) {
+            return project;
+          }
+        });
       });
   },
 });
+export const { setSelectedProject } = projectSlice.actions;
 export default projectSlice.reducer;

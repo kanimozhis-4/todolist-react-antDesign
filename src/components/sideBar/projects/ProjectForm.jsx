@@ -10,14 +10,10 @@ const ProjectForm = ({ isVisible, setIsProject }) => {
     editedProject,
     saveProject,
   } = useContext(ProjectsContext);
-  const tempProject = {
-    name: newProject.name,
-    color: newProject.color,
-    is_favorite: newProject.is_favorite,
-  };
 
   return (
     <Modal
+      key={newProject?.id || "new"}
       title={
         <div>
           <div className="flex items-center">
@@ -31,14 +27,14 @@ const ProjectForm = ({ isVisible, setIsProject }) => {
       }
       open={isVisible}
       onCancel={() => {
-        setNewProject({ ...tempProject });
+        setNewProject({ name: "", color: "charcoal", is_favorite: false });
         setIsProject(false);
       }}
       footer={[
         <Button
           key="cancel"
           onClick={() => {
-            setNewProject({ ...tempProject });
+            setNewProject({ name: "", color: "charcoal", is_favorite: false });
             setIsProject(false);
           }}
         >
@@ -48,9 +44,8 @@ const ProjectForm = ({ isVisible, setIsProject }) => {
           key="add"
           type="primary"
           className="bg-red-700"
-          disabled={newProject.name === ""}
+          disabled={newProject?.name === ""}
           onClick={() => {
-            
             newProject?.id
               ? editedProject(newProject?.id, newProject)
               : saveProject();
@@ -66,23 +61,8 @@ const ProjectForm = ({ isVisible, setIsProject }) => {
         </Button>,
       ]}
     >
-      <Form
-        name={newProject?.id ? "editProjectForm" : "createProjectForm"}
-        layout="vertical"
-        style={{ maxWidth: 600 }}
-        initialValues={{
-          Name: newProject.name,
-          Color: newProject.color,
-        }}
-        onSubmit={(e) => {
-          e.preventDefault();
-        }}
-      >
-        <Form.Item
-          label={<span style={{ fontWeight: "bold" }}>Name</span>}
-          name="Name"
-          validateTrigger={["onBlur", "onChange"]}
-        >
+      <Form layout="vertical" initialValues={newProject}>
+        <Form.Item label="Name">
           <Input
             value={newProject?.name}
             onChange={(e) =>
@@ -90,10 +70,7 @@ const ProjectForm = ({ isVisible, setIsProject }) => {
             }
           />
         </Form.Item>
-        <Form.Item
-          label={<span style={{ fontWeight: "bold" }}>Color</span>}
-          name="Color"
-        >
+        <Form.Item label="Color">
           <Select
             style={{ width: 200 }}
             value={newProject?.color}

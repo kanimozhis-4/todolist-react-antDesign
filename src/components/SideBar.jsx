@@ -14,9 +14,11 @@ import Upcoming from "./sideBar/Upcoming";
 import FilterLabel from "./sideBar/FilterLabel";
 import Favorites from "./sideBar/favorites/Favorites";
 import Projects from "./sideBar/projects/Projects";
+import { useSelector } from "react-redux";
 
 const { Sider } = Layout;
 const SideBar = ({collapsed,setCollapsed}) => {
+const email=useSelector((state)=>state.user.email);
 
   return (
     <Sider
@@ -32,9 +34,9 @@ const SideBar = ({collapsed,setCollapsed}) => {
         <div className="flex flex-col gap-4">
           <div className="flex justify-between  items-center gap-2 ">
             <Avatar className="w-7 h-7 text-sm font-semibold text-white bg-blue-800">
-              K
+              {email?.charAt(0).toUpperCase()}
             </Avatar>
-            <div className="text-sm font-bold">skanimozhi48</div>
+            <div className="text-sm font-bold">{email}</div>
             <Tooltip
               title={
                 <span>

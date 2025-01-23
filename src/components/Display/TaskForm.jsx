@@ -5,35 +5,29 @@ import moment from "moment";
 import _ from "lodash";
 import { DownOutlined, CheckOutlined } from "@ant-design/icons";
 import { TasksContext } from "../../contexts/TaskContext";
-import dayjs from 'dayjs';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 dayjs.extend(customParseFormat);
-const dateFormat = 'YYYY-MM-DD';
-const TaskForm = ({ taskId, projectId ,selectedProject,setEditingTaskId}) => {
-  const { allProjects, colorMapping } =
-    useContext(ProjectsContext);
-  const {
-    newTask,
-    addNewTask,
-    setNewTask,
-    allTask,
-    editedTask,
-  } = useContext(TasksContext);
+const dateFormat = "YYYY-MM-DD";
+const TaskForm = ({ taskId, projectId, selectedProject, setEditingTaskId }) => {
+  const { allProjects, colorMapping } = useContext(ProjectsContext);
+  const { newTask, addNewTask, setNewTask, allTask, editedTask } =
+    useContext(TasksContext);
   const [selectedProjectName, setSelectedProjectName] = useState({
     name: null,
     color: null,
-  }); 
-  
+  });
+
   let tempTask = {};
-  let taskToEdit={...newTask}
+  let taskToEdit = { ...newTask };
   if (taskId) {
-     taskToEdit = allTask?.find((task) => task.task_id === taskId);
+    taskToEdit = allTask?.find((task) => task.task_id === taskId);
     tempTask = {
       content: taskToEdit.content,
       description: taskToEdit.description,
-      due_date: taskToEdit.due_date ||null,
+      due_date: taskToEdit.due_date || null,
       project_id: taskToEdit.project_id,
-    }; 
+    };
   }
   useEffect(() => {
     if (taskId) {
@@ -42,7 +36,7 @@ const TaskForm = ({ taskId, projectId ,selectedProject,setEditingTaskId}) => {
         setNewTask({
           content: taskToEdit.content,
           description: taskToEdit.description,
-          due_date: taskToEdit?.due_date ||null,
+          due_date: taskToEdit?.due_date || null,
           project_id: taskToEdit.project_id,
         });
       }
@@ -83,7 +77,7 @@ const TaskForm = ({ taskId, projectId ,selectedProject,setEditingTaskId}) => {
   let selectedProjectColor = "";
   if (selectedProject != "") {
     const project = allProjects.find(
-      (project) => project.name === selectedProject[0]?.name
+      (project) => project.name === selectedProject?.name
     );
     selectedProjectColor = project?.color;
   }
@@ -95,15 +89,14 @@ const TaskForm = ({ taskId, projectId ,selectedProject,setEditingTaskId}) => {
     const selectedProject = {
       name: projectName.key,
       color: project.color,
-    }; 
-    setSelectedProjectName({...selectedProject});
+    };
+    setSelectedProjectName({ ...selectedProject });
     setNewTask((prevTask) => ({
       ...prevTask,
       project_id: project.id,
     }));
   };
   const handleInputChange = (value, field) => {
-
     setNewTask((prevTask) => ({
       ...prevTask,
       [field]: value,
@@ -113,12 +106,11 @@ const TaskForm = ({ taskId, projectId ,selectedProject,setEditingTaskId}) => {
     const taskToSave = {
       ...newTask,
       project_id: projectId || "2345640986",
-      due_date: newTask?.due_date
-        || null,
-    }; 
+      due_date: newTask?.due_date || null,
+    };
     if (taskId === "") {
       await addNewTask(taskToSave);
-      setEditingTaskId(null); 
+      setEditingTaskId(null);
     } else {
       await editedTask(taskId, newTask);
     }
@@ -128,14 +120,13 @@ const TaskForm = ({ taskId, projectId ,selectedProject,setEditingTaskId}) => {
     setNewTask({ ...tempTask });
 
     setEditingTaskId(null);
-  }; 
-  const handleInputDate=async (date,dateString)=>{
+  };
+  const handleInputDate = async (date, dateString) => {
     setNewTask((prevTask) => ({
       ...prevTask,
-      "due_date": dateString,
-    })); 
-
-  }
+      due_date: dateString,
+    }));
+  };
 
   return (
     <Card
@@ -158,7 +149,11 @@ const TaskForm = ({ taskId, projectId ,selectedProject,setEditingTaskId}) => {
         />
         <DatePicker
           className="w-[25%] m-2"
-          defaultValue={taskToEdit.due_date ? dayjs(taskToEdit.due_date, dateFormat) : undefined}
+          defaultValue={
+            taskToEdit.due_date
+              ? dayjs(taskToEdit.due_date, dateFormat)
+              : undefined
+          }
           onChange={handleInputDate}
         />
         <hr />

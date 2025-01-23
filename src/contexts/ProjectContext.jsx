@@ -56,6 +56,11 @@ const ProjectContext = ({ children }) => {
   };
 
   const editedProject = async (id, newProject) => {
+    setNewProject({
+      name: "",
+      color: "charcoal",
+      is_favorite: false,
+    });
     const project = {
       name: newProject.name,
       color: newProject.color,
@@ -64,12 +69,6 @@ const ProjectContext = ({ children }) => {
 
     try {
       await dispatch(updateProjectAsync({ id: id, newProject: project }));
-
-      setNewProject({
-        name: "",
-        color: "charcoal",
-        is_favorite: false,
-      });
     } catch (error) {
       console.log("Error updating project:", error);
     }

@@ -1,21 +1,25 @@
 import React, { useState, useContext } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { ProjectsContext } from "../../../contexts/ProjectContext";
 import { Tooltip } from "antd";
 import { EllipsisOutlined } from "@ant-design/icons";
 import ProjectForm from "./ProjectForm";
 import { useNavigate } from "react-router-dom";
+import { setSelectedProject } from "../../../slice/ProjectSlice";
 
 const ShowProjects = ({ show, isProject, setIsProject }) => {
   const navigate = useNavigate();
   const {
     allProjects,
-    newProject,
     setNewProject,
     colorMapping,
     removeProject,
     editedProject,
   } = useContext(ProjectsContext);
-  const [selectedProject, setSelectedProject] = useState({});
+  const dispatch = useDispatch();
+  const selectedProject = useSelector(
+    (state) => state.projects.selectedProject
+  );
   const [activeTooltip, setActiveTooltip] = useState(null);
   const [showOption, setShowOption] = useState(false);
   const handleEdit = (project) => {
@@ -28,6 +32,7 @@ const ShowProjects = ({ show, isProject, setIsProject }) => {
     setActiveTooltip(null);
     setIsProject(true);
   };
+
   const handleFavorites = async (project) => {
     try {
       const id = project.project_id;
@@ -44,7 +49,7 @@ const ShowProjects = ({ show, isProject, setIsProject }) => {
     }
   };
   const handleItemClick = (project) => {
-    setSelectedProject({ ...project });
+    dispatch(setSelectedProject({ ...project }));
     navigate(`/project/${project.project_id}`);
   };
 
@@ -52,7 +57,11 @@ const ShowProjects = ({ show, isProject, setIsProject }) => {
     <div className="flex flex-col space-y-2 mt-2">
       {allProjects.map((project, index) => {
         const hexColor = colorMapping[project?.color] || "#000000";
-        if (show === "all" || project.is_favorite === 1 || project.is_favorite==true)
+        if (
+          show === "all" ||
+          project.is_favorite === 1 ||
+          project.is_favorite == true
+        )
           return (
             <div
               key={project.project_id}
@@ -63,7 +72,8 @@ const ShowProjects = ({ show, isProject, setIsProject }) => {
                       : " hover:bg-gray-300 hover:rounded"
                   }
                   `}
-              onClick={() => {
+              onClick={(e) => {
+                console.log("clicked");
                 handleItemClick(project);
               }}
             >
@@ -73,12 +83,14 @@ const ShowProjects = ({ show, isProject, setIsProject }) => {
               <span>{project.name}</span>
               <EllipsisOutlined
                 className="opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer float-right "
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   setActiveTooltip(
                     activeTooltip?.id === project.project_id
                       ? null
                       : { name: show, id: project.project_id }
                   );
+                  handleItemClick(project);
                   setShowOption(!showOption);
                 }}
               />
@@ -103,7 +115,8 @@ const ShowProjects = ({ show, isProject, setIsProject }) => {
                         >
                           ⭐{" "}
                           <span className="ml-2">
-                            {project.is_favorite === 1
+                            {project.is_favorite == 1 ||
+                            project.is_favorite == true
                               ? "Remove from Favorite"
                               : "Add from Favorite"}
                           </span>

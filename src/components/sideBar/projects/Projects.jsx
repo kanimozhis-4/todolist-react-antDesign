@@ -5,7 +5,17 @@ import ProjectForm from "./ProjectForm";
 import { ProjectsContext } from "../../../contexts/ProjectContext";
 const Projects = () => {
   const [isProject, setIsProject] = useState(false);
-  const { showProjects, setShowProjects } = useContext(ProjectsContext);
+  const { showProjects, setShowProjects, setNewProject, newProject } =
+    useContext(ProjectsContext);
+  const handleNewProject = () => {
+    console.log("newProject", newProject);
+    setNewProject({
+      name: "",
+      color: "charcoal",
+      is_favorite: false,
+    });
+    setIsProject(true);
+  };
   return (
     <div>
       <div className="flex flex-row justify-between cursor-pointer">
@@ -15,7 +25,7 @@ const Projects = () => {
             className={`text-gray-500 opacity-0 transition-opacity group-hover:opacity-100 group-focus:opacity-100 cursor-default
       
             `}
-            onClick={() => setIsProject(true)}
+            onClick={handleNewProject}
           />
           {!showProjects ? (
             <RightOutlined

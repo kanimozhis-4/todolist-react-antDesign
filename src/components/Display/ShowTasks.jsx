@@ -3,9 +3,13 @@ import { Checkbox } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import TaskForm from "./TaskForm";
 import { TasksContext } from "../../contexts/TaskContext";
-const ShowTasks = ({ projectId,selectedProject , setEditingTaskId, editingTaskId}) => {
-  const { allTask, removeTask, closedTask } =
-    useContext(TasksContext);
+const ShowTasks = ({
+  projectId,
+  selectedProject,
+  setEditingTaskId,
+  editingTaskId,
+}) => {
+  const { allTask, removeTask, closedTask } = useContext(TasksContext);
   const [hoveredTaskId, setHoveredTaskId] = useState(null);
 
   const defaultProjectId = "2345640986";
@@ -27,15 +31,21 @@ const ShowTasks = ({ projectId,selectedProject , setEditingTaskId, editingTaskId
   const handleCheckbox = async (id) => {
     await closedTask(id);
   };
-
+  console.log(editingTaskId, task, "www");
   return (
     <div className="flex flex-col space-y-4">
       {task.map((task) =>
-        editingTaskId == task.task_id ? (
-          <TaskForm  key={`form-${task.task_id}`} taskId={task.task_id} projectId={projectId} selectedProject={selectedProject} setEditingTaskId={setEditingTaskId}/>
+        editingTaskId === task.task_id ? (
+          <TaskForm
+            key={`form-${task.task_id}`}
+            taskId={task.task_id}
+            projectId={projectId}
+            selectedProject={selectedProject}
+            setEditingTaskId={setEditingTaskId}
+          />
         ) : (
           <div
-          key={`task-${task.task_id}`}
+            key={`task-${task.task_id}`}
             className="flex space-x-4 justify-between"
             onMouseEnter={() => handleMouseEnter(task.task_id)}
             onMouseLeave={handleMouseLeave}
@@ -52,7 +62,9 @@ const ShowTasks = ({ projectId,selectedProject , setEditingTaskId, editingTaskId
                 <EditOutlined
                   className="text-gray-500 cursor-pointer text-lg hover:scale-110"
                   title="Edit Task"
-                  onClick={() =>{setEditingTaskId(task.task_id)}}
+                  onClick={() => {
+                    setEditingTaskId(task.task_id);
+                  }}
                 />
                 <DeleteOutlined
                   className="text-gray-500 cursor-pointer text-lg hover:scale-110"
